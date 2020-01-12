@@ -24,24 +24,12 @@ var map = {
   ]
 }
 
-document.addEventListener("keydown", function(event) {
-  /* Moving */
+window.addEventListener("keydown", function(event) {
+  /*  */
 
-  if (event.key+""==="ArrowRight") {
-    army.x += 3;
-  }
 
-  if (event.key+""==="ArrowLeft") {
-    army.x -= 3;
-  }
 
-  if (event.key+""==="ArrowUp") {
-    army.y -= 3;
-  }
-
-  if (event.key+""==="ArrowDown") {
-    army.y += 3;
-  }
+  return true;
 });
 
 function generateWorld(minX, maxX, minY, maxY, numCities, numArmies) {
