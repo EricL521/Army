@@ -3,6 +3,11 @@ document.write("<canvas id='canvas' width='1347' height='587' style='border:2px 
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
 
+/* Resize canvas to client's size */
+canvas.width  = window.innerWidth - 25;
+canvas.height = window.innerHeight - 25;
+
+
 var keysPressed = [];
 
 /* Player's army */
