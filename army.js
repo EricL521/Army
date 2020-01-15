@@ -109,13 +109,24 @@ function move() {
 /* draws player army */
 function drawArmy() {
   ctx.beginPath();
-  ctx.arc(canvas.width/2, canvas.height/2, 20, 0, 2 * Math.PI);
+  ctx.arc(canvas.width/2, canvas.height/2, 40, 0, 2 * Math.PI);
   ctx.stroke();
 
   ctx.fillStyle = "black";
   ctx.textAlign = "center";
+  ctx.font = "60px Arial";
+  ctx.fillText("Army", canvas.width/2, canvas.height/2 - 43);
+
+  ctx.fillStyle = "black";
+  ctx.textAlign = "center";
   ctx.font = "30px Arial";
-  ctx.fillText("Army", canvas.width/2, canvas.height/2 - 23);
+  ctx.fillText("Troops: " + army.troops, canvas.width/2, canvas.height/2 + 60);
+
+
+  ctx.fillStyle = "black";
+  ctx.textAlign = "center";
+  ctx.font = "30px Arial";
+  ctx.fillText("Food: " + army.food, canvas.width/2, canvas.height/2 + 90);
 }
 
 /* Draws all cities */
