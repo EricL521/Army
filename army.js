@@ -58,6 +58,7 @@ function generateWorld(minX, maxX, minY, maxY, numCities, numArmies, minDistance
       x: (Math.random() * (maxX - minX)) + minX,
       y: (Math.random() * (maxY - minY)) + minY,
       health: people/25 + Math.floor(Math.random() * people/50),
+			updateTimer: new Date()
     });
   }
 
@@ -162,6 +163,25 @@ function drawCities() {
   }
 }
 
+/* Updates Cities */
+function updateCities() {
+	for (var i = 0; i < map.cities.length; i ++) {
+		
+		/* 20 second timer */
+		if (new Date() - map.cities[i].updateTimer > 5000) {
+			/* Population Growth */
+			map.cities[i].people = Math.floor(map.cities[i].people * 1.01);
+			
+			/* Food Increase */
+			map.cities[i].food += Math.floor(map.cities[i].people / 100);
+			
+			/* Reset Timer */
+			map.cities[i].updateTimer = new Date();
+			
+		}
+	}
+}
+
 generateWorld(2000, 8000, 2000, 8000, 4000, 0, 100);
 
 function draw() {
@@ -170,6 +190,9 @@ function draw() {
 
   /* Draws Cities */
   drawCities();
+	
+	/* Updates Cities */
+	updateCities();
 
   /* Draws army */
   drawArmy();
