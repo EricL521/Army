@@ -9,7 +9,7 @@ var keysPressed = [];
 var army = {
   x : 5000,
   y : 5000,
-  troops : 2000,
+  troops : 500,
   food: 1000
   /* Size of the army is based on the amount of troops */
 };
@@ -46,7 +46,7 @@ function generateWorld(minX, maxX, minY, maxY, numCities, numArmies, minDistance
 
   /* Generates Cities */
   for (var i = 0; i < numCities; i ++) {
-    people = Math.floor((Math.random() * (army.troops/25)) + army.troops/3);
+    people = Math.floor((Math.random() * (army.troops/3)) + army.troops/3);
     map.cities.push({
       food: Math.floor((Math.random() * (people)) + 2 * people),
       people: people,
@@ -82,22 +82,22 @@ function generateWorld(minX, maxX, minY, maxY, numCities, numArmies, minDistance
 function move() {
   /* Moves up */
   if (keysPressed[38]) {
-    army.y -= 0.5;
+    army.y -= 2;
   }
 
   /* Moves down */
   if (keysPressed[40]) {
-    army.y += 0.5;
+    army.y += 2;
   }
 
   /* Moves right */
   if (keysPressed[39]) {
-    army.x += 0.5;
+    army.x += 2;
   }
 
   /* Moves Left */
   if (keysPressed[37]) {
-    army.x -= 0.5;
+    army.x -= 2;
   }
 }
 
@@ -123,23 +123,23 @@ function drawCities() {
 
     /* Draws Circles at Cities */
       ctx.beginPath();
-	    ctx.arc((map.cities[i].x - army.x)/army.troops * 1000 + canvas.width/2, (map.cities[i].y - army.y)/army.troops * 1000 + canvas.height/2, 10/army.troops * 1000, 0, 2 * Math.PI);
+	    ctx.arc((map.cities[i].x - army.x)/army.troops * 1000 + canvas.width/2, (map.cities[i].y - army.y)/army.troops * 1000 + canvas.height/2, 10/army.troops * 1000 * (map.cities[i].people/(Math.floor(army.troops/50 + army.troops/3))), 0, 2 * Math.PI);
 	    ctx.fillStyle = "green";
 	    ctx.fill();
 
       /*  Text to label cities */
       ctx.fillStyle = "black";
       ctx.textAlign = "center";
-      ctx.font = 30/army.troops * 500 + "px Arial";
-      ctx.fillText("City", (map.cities[i].x - army.x)/army.troops * 1000 + canvas.width/2, (map.cities[i].y - army.y)/army.troops * 1000 + canvas.height/2 - 10/army.troops * 1500);
+      ctx.font = 30/army.troops * 500 * (map.cities[i].people/(Math.floor(army.troops/50 + army.troops/3))) + "px Arial";
+      ctx.fillText("City " + (i + 1), (map.cities[i].x - army.x)/army.troops * 1000 + canvas.width/2, (map.cities[i].y - army.y)/army.troops * 1000 + canvas.height/2 - 10/army.troops * 1500 * (map.cities[i].people/(Math.floor(army.troops/50 + army.troops/3))));
 
       /* Population */
-      ctx.font = 20/army.troops * 500 + "px Arial";
-      ctx.fillText(map.cities[i].people + " people", (map.cities[i].x - army.x)/army.troops * 1000 + canvas.width/2, (map.cities[i].y - army.y)/army.troops * 1000 + canvas.height/2 + 10/army.troops * 1750/*34/*17*/);
+      ctx.font = 20/army.troops * 500 * (map.cities[i].people/(Math.floor(army.troops/50 + army.troops/3))) + "px Arial";
+      ctx.fillText(map.cities[i].people + " people", (map.cities[i].x - army.x)/army.troops * 1000 + canvas.width/2, (map.cities[i].y - army.y)/army.troops * 1000 + canvas.height/2 + 10/army.troops * 1750 * (map.cities[i].people/(Math.floor(army.troops/50 + army.troops/3))));
 
       /* Food */
-      ctx.font = 20/army.troops * 500 + "px Arial";
-      ctx.fillText(map.cities[i].food + " food", (map.cities[i].x - army.x)/army.troops * 1000 + canvas.width/2, (map.cities[i].y - army.y)/army.troops * 1000 + canvas.height/2 + 10/army.troops * 2750/*56/*28*/);
+      ctx.font = 20/army.troops * 500 * (map.cities[i].people/(Math.floor(army.troops/50 + army.troops/3))) + "px Arial";
+      ctx.fillText(map.cities[i].food + " food", (map.cities[i].x - army.x)/army.troops * 1000 + canvas.width/2, (map.cities[i].y - army.y)/army.troops * 1000 + canvas.height/2 + 10/army.troops * 2750 * (map.cities[i].people/(Math.floor(army.troops/50 + army.troops/3))));
     }
   }
 }
