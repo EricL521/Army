@@ -112,17 +112,19 @@ function drawArmy() {
   ctx.arc(canvas.width/2, canvas.height/2, 40, 0, 2 * Math.PI);
   ctx.stroke();
 
+  /* Draws Circle */
   ctx.fillStyle = "black";
   ctx.textAlign = "center";
   ctx.font = "60px Arial";
   ctx.fillText("Army", canvas.width/2, canvas.height/2 - 43);
 
+  /* Labels # troops */
   ctx.fillStyle = "black";
   ctx.textAlign = "center";
   ctx.font = "30px Arial";
   ctx.fillText("Troops: " + army.troops, canvas.width/2, canvas.height/2 + 60);
 
-
+  /* Labels # food */
   ctx.fillStyle = "black";
   ctx.textAlign = "center";
   ctx.font = "30px Arial";
