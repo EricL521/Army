@@ -6,6 +6,10 @@ var ctx = canvas.getContext('2d');
 /* Update Timer */
 var updateTimer = new Date();
 
+/* Mouse coords */
+var mouseX = 0;
+var mouseY = 0;
+
 /* Resize canvas to client's size */
 canvas.width  = window.innerWidth - 25;
 canvas.height = window.innerHeight - 25;
@@ -48,6 +52,12 @@ window.addEventListener("keyup", function(event) {
   return true;
 });
 
+/* Get's mouse position */
+canvas.addEventListener("mousemove", function(e) {
+	mouseX = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft - canvas.offsetLeft - 2;
+	mouseY = e.clientY + document.body.scrollTop + document.documentElement.scrollTop - canvas.offsetTop - 2;
+});
+
 /* Creates the cities and armies */
 function generateWorld(minX, maxX, minY, maxY, numCities, numArmies, minDistance) {
   var people = 0;
@@ -60,7 +70,8 @@ function generateWorld(minX, maxX, minY, maxY, numCities, numArmies, minDistance
       people: people,
       x: (Math.random() * (maxX - minX)) + minX,
       y: (Math.random() * (maxY - minY)) + minY,
-      health: people/25 /* people/25 is max health */
+      health: people/25, /* people/25 is max health */
+			clickedOn: false
     });
   }
 
@@ -135,12 +146,13 @@ function drawArmy() {
 /* Draws all cities */
 function drawCities() {
   for (var i = 0; i < map.cities.length; i ++) {
+		/* Check if city is on screen */
     if ((map.cities[i].x - army.x)/army.troops * 1000 + canvas.width/2 > - 100 &&
       (map.cities[i].x - army.x)/army.troops * 1000 + canvas.width/2 < canvas.width + 100 &&
       (map.cities[i].y - army.y)/army.troops * 1000 + canvas.height/2 > - 100 &&
       (map.cities[i].y - army.y)/army.troops * 1000 + canvas.height/2 < canvas.height + 100) {
 
-    /* Draws Circles at Cities */
+    	/* Draws Circles at Cities */
       ctx.beginPath();
 	    ctx.arc((map.cities[i].x - army.x)/army.troops * 1000 + canvas.width/2, (map.cities[i].y - army.y)/army.troops * 1000 + canvas.height/2, 40 * (map.cities[i].people/army.troops), 0, 2 * Math.PI);
 	    ctx.fillStyle = "green";
@@ -192,7 +204,26 @@ function updateCities() {
 			
 		updateTimer = new Date();
 	}
+	
 }
+
+/* When mouse is clicked */
+document.onmouseup = function() {
+	/* Check if city is clicked */
+	for (var i = 0; i < map.cities.length; i ++) {
+		/* Check if city is rendered */
+		if ((map.cities[i].x - army.x)/army.troops * 1000 + canvas.width/2 > - 100 &&
+      (map.cities[i].x - army.x)/army.troops * 1000 + canvas.width/2 < canvas.width + 100 &&
+      (map.cities[i].y - army.y)/army.troops * 1000 + canvas.height/2 > - 100 &&
+      (map.cities[i].y - army.y)/army.troops * 1000 + canvas.height/2 < canvas.height + 100) {
+			
+			if (Math.sqrt(Math.pow((map.cities[i].x - army.x)/army.troops * 1000 + canvas.width/2 - mouseX, 2) + Math.pow((map.cities[i].y - army.y)/army.troops * 1000 - mouseY + canvas.height/2, 2)) < 40 * (map.cities[i].people/army.troops)) {
+					map.cities[i].clickedOn = true;
+			}
+			
+		}
+	}
+};
 
 generateWorld(2000, 8000, 2000, 8000, 4000, 0, 100);
 
