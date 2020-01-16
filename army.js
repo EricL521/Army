@@ -3,6 +3,9 @@ document.write("<canvas id='canvas' width='1347' height='587' style='border:2px 
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
 
+/* Update Timer */
+var updateTimer = new Date();
+
 /* Resize canvas to client's size */
 canvas.width  = window.innerWidth - 25;
 canvas.height = window.innerHeight - 25;
@@ -57,12 +60,9 @@ function generateWorld(minX, maxX, minY, maxY, numCities, numArmies, minDistance
       people: people,
       x: (Math.random() * (maxX - minX)) + minX,
       y: (Math.random() * (maxY - minY)) + minY,
-      health: people/25 + Math.floor(Math.random() * people/50),
-			updateTimer: new Date()
+      health: people/25 /* people/25 is max health */
     });
   }
-
-  console.log(map.cities);
 
   /* Deletes cities that are too close to each other */
   for (var i = 0; i < map.cities.length; i ++) {
@@ -150,35 +150,47 @@ function drawCities() {
       ctx.fillStyle = "black";
       ctx.textAlign = "center";
       ctx.font = 30 * (map.cities[i].people/army.troops) + "px Arial";
-      ctx.fillText("City " + (i + 1), (map.cities[i].x - army.x)/army.troops * 1000 + canvas.width/2, (map.cities[i].y - army.y)/army.troops * 1000 + canvas.height/2 - 40 * (map.cities[i].people/army.troops) - 13 * (map.cities[i].people/army.troops));
+      ctx.fillText("City " + (i + 1), (map.cities[i].x - army.x)/army.troops * 1000 + canvas.width/2, (map.cities[i].y - army.y)/army.troops * 1000 + canvas.height/2 - 45 * (map.cities[i].people/army.troops) - 20 * (map.cities[i].people/army.troops));
 
       /* Population */
       ctx.font = 20 * (map.cities[i].people/army.troops) + "px Arial";
-      ctx.fillText(map.cities[i].people + " people", (map.cities[i].x - army.x)/army.troops * 1000 + canvas.width/2, (map.cities[i].y - army.y)/army.troops * 1000 + canvas.height/2 + 57 * (map.cities[i].people/army.troops));
+      ctx.fillText(Math.floor(map.cities[i].people) + " people", (map.cities[i].x - army.x)/army.troops * 1000 + canvas.width/2, (map.cities[i].y - army.y)/army.troops * 1000 + canvas.height/2 + 57 * (map.cities[i].people/army.troops));
 
       /* Food */
       ctx.font = 20 * (map.cities[i].people/army.troops) + "px Arial";
-      ctx.fillText(map.cities[i].food + " food", (map.cities[i].x - army.x)/army.troops * 1000 + canvas.width/2, (map.cities[i].y - army.y)/army.troops * 1000 + canvas.height/2 + 77 * (map.cities[i].people/army.troops));
-    }
+      ctx.fillText(Math.floor(map.cities[i].food) + " food", (map.cities[i].x - army.x)/army.troops * 1000 + canvas.width/2, (map.cities[i].y - army.y)/army.troops * 1000 + canvas.height/2 + 77 * (map.cities[i].people/army.troops));
+    	
+			/* Health Bar */
+			ctx.fillStyle = "red";
+			ctx.fillRect((map.cities[i].x - army.x)/army.troops * 1000 + canvas.width/2 - 50 * (map.cities[i].people/army.troops), (map.cities[i].y - army.y)/army.troops * 1000 + canvas.height/2 - 40 * (map.cities[i].people/army.troops) - 18 * (map.cities[i].people/army.troops), 100 * (map.cities[i].people/army.troops), 15 * (map.cities[i].people/army.troops));
+			ctx.fillStyle = "green";
+			ctx.fillRect((map.cities[i].x - army.x)/army.troops * 1000 + canvas.width/2 - 50 * (map.cities[i].people/army.troops), (map.cities[i].y - army.y)/army.troops * 1000 + canvas.height/2 - 40 * (map.cities[i].people/army.troops) - 18 * (map.cities[i].people/army.troops), 100 * (map.cities[i].people/army.troops) * map.cities[i].health / (map.cities[i].people/25), 15 * (map.cities[i].people/army.troops));
+		}
   }
 }
 
 /* Updates Cities */
 function updateCities() {
-	for (var i = 0; i < map.cities.length; i ++) {
-		
-		/* 20 second timer */
-		if (new Date() - map.cities[i].updateTimer > 5000) {
+	/* Timer for 1 second */
+	if (new Date() - updateTimer > 1000) {
+	
+		for (var i = 0; i < map.cities.length; i ++) {
 			/* Population Growth */
-			map.cities[i].people = Math.floor(map.cities[i].people * 1.01);
-			
+			map.cities[i].people *= 1.001;
+
 			/* Food Increase */
-			map.cities[i].food += Math.floor(map.cities[i].people / 100);
+			map.cities[i].food += map.cities[i].people / 1000;
 			
-			/* Reset Timer */
-			map.cities[i].updateTimer = new Date();
-			
+			/* Repair city */
+			if (map.cities[i].health + map.cities[i].people/750 > map.cities[i].people/25) {
+				map.cities[i].health = map.cities[i].people/25;
+			} else {
+				map.cities[i].health += map.cities[i].people/750;
+			}
 		}
+		
+			
+		updateTimer = new Date();
 	}
 }
 
