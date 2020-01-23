@@ -1,4 +1,6 @@
+document.write("<button onClick='blockading = true;' id='blockade-button' style='display: none; position: absolute; height: 105px; width: 105px; margin-left: 12px; margin-top: 37px;'></button>");
 document.write("<canvas id='canvas' width='1347' height='587' style='border:2px solid black'></canvas>");
+
 /* Sets up Canvas */
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
@@ -14,6 +16,9 @@ var mouseY = 0;
 canvas.width  = window.innerWidth - 25;
 canvas.height = window.innerHeight - 25;
 
+/* City selected */
+var citySelected = -1;
+var blockading = false;
 
 var keysPressed = [];
 
@@ -70,8 +75,7 @@ function generateWorld(minX, maxX, minY, maxY, numCities, numArmies, minDistance
       people: people,
       x: (Math.random() * (maxX - minX)) + minX,
       y: (Math.random() * (maxY - minY)) + minY,
-      health: people/25, /* people/25 is max health */
-			clickedOn: false
+      health: people/25 /* people/25 is max health */
     });
   }
 
@@ -97,25 +101,30 @@ function generateWorld(minX, maxX, minY, maxY, numCities, numArmies, minDistance
 
 /* Moves your army */
 function move() {
-  /* Moves up */
-  if (keysPressed[38]) {
-    army.y -= 2;
-  }
+	/* Don't move if attacking a city */
+	if (citySelected === -1) {
 
-  /* Moves down */
-  if (keysPressed[40]) {
-    army.y += 2;
-  }
+		/* Moves up */
+		if (keysPressed[38]) {
+			army.y -= 2;
+		}
 
-  /* Moves right */
-  if (keysPressed[39]) {
-    army.x += 2;
-  }
+		/* Moves down */
+		if (keysPressed[40]) {
+			army.y += 2;
+		}
 
-  /* Moves Left */
-  if (keysPressed[37]) {
-    army.x -= 2;
-  }
+		/* Moves right */
+		if (keysPressed[39]) {
+			army.x += 2;
+		}
+
+		/* Moves Left */
+		if (keysPressed[37]) {
+			army.x -= 2;
+		}
+	
+	}
 }
 
 /* draws player army */
@@ -200,11 +209,36 @@ function updateCities() {
 				map.cities[i].health += map.cities[i].people/750;
 			}
 		}
-		
 			
 		updateTimer = new Date();
 	}
 	
+}
+
+/* Attack menu */
+function attackMenu() {
+	/* Move your army to city */
+	army.x = map.cities[citySelected].x;
+	army.y = map.cities[citySelected].y;
+	
+	/* Box for menu */
+	ctx.clearRect(5, 5, canvas.width - 10, 150);
+	ctx.beginPath();
+	ctx.rect(5, 5, canvas.width - 10, 150);
+	ctx.stroke();
+	
+	/* City you're attacking */
+	ctx.fillStyle = "black";
+	ctx.textAlign = "left";
+  ctx.font = "20px Arial";
+	ctx.fillText("Attacking city " + (citySelected + 1), 10, 25);
+	
+	/* Button for blockading a city */
+	document.getElementById('blockade-button').setAttribute("style", "display: block; position: absolute; height: 105px; width: 105px; margin-left: 10px; margin-top: 35px;");
+	ctx.fillStyle = "black";
+	ctx.textAlign = "center";
+	ctx.font = "11px Arial";
+	ctx.fillText("Blockade/Starve", 60, 150);
 }
 
 /* When mouse is clicked */
@@ -217,8 +251,8 @@ document.onmouseup = function() {
       (map.cities[i].y - army.y)/army.troops * 1000 + canvas.height/2 > - 100 &&
       (map.cities[i].y - army.y)/army.troops * 1000 + canvas.height/2 < canvas.height + 100) {
 			
-			if (Math.sqrt(Math.pow((map.cities[i].x - army.x)/army.troops * 1000 + canvas.width/2 - mouseX, 2) + Math.pow((map.cities[i].y - army.y)/army.troops * 1000 - mouseY + canvas.height/2, 2)) < 40 * (map.cities[i].people/army.troops)) {
-					map.cities[i].clickedOn = true;
+			if (Math.sqrt(Math.pow((map.cities[i].x - army.x)/army.troops * 1000, 2) + Math.pow((map.cities[i].y - army.y)/army.troops * 1000, 2)) < 40 + 40 * (map.cities[i].people/army.troops) && Math.sqrt(Math.pow((map.cities[i].x - army.x)/army.troops * 1000 + canvas.width/2 - mouseX, 2) + Math.pow((map.cities[i].y - army.y)/army.troops * 1000 - mouseY + canvas.height/2, 2)) < 40 * (map.cities[i].people/army.troops)) {
+					citySelected = i;
 			}
 			
 		}
@@ -228,6 +262,13 @@ document.onmouseup = function() {
 generateWorld(2000, 8000, 2000, 8000, 4000, 0, 100);
 
 function draw() {
+	/* Resets Blockade Buttons */
+	document.getElementById('blockade-button').setAttribute("style", "display: none; position: absolute; height: 105px; width: 105px; margin-left: 10px; margin-top: 35px;");
+	
+	/* Resize canvas to client's size */
+	canvas.width  = window.innerWidth - 25;
+	canvas.height = window.innerHeight - 25;
+	
   /* Clears Canvas */
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -242,7 +283,11 @@ function draw() {
 
   /* Moves your army */
   move();
-
+	
+	if (citySelected >= 0) {
+		attackMenu();
+	}
+	
   requestAnimationFrame(draw);
 }
 
