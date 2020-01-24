@@ -1,4 +1,10 @@
-document.write("<button onClick='blockading = true;' id='blockade-button' style='display: none; position: absolute; height: 105px; width: 105px; margin-left: 12px; margin-top: 37px;'></button>");
+/* Attack Menu Buttons */
+/* Blockade Button */
+document.write("<button onClick='blockading = true;' id='blockade-button'> <p style='font-size: 25px; margin-bottom: 5px;'>Blockade</p><p style='font-size: 25px; margin-top: 5px'>/Starve</p> </button>");
+/* Close Menu Button */
+document.write("<button onClick='citySelected = -1; blockading = false;' id='close-attack-menu-button'>X</button>");
+
+/* Canvas */
 document.write("<canvas id='canvas' width='1347' height='587' style='border:2px solid black'></canvas>");
 
 /* Sets up Canvas */
@@ -129,27 +135,30 @@ function move() {
 
 /* draws player army */
 function drawArmy() {
+  /* Draws Circle */
   ctx.beginPath();
   ctx.arc(canvas.width/2, canvas.height/2, 40, 0, 2 * Math.PI);
   ctx.stroke();
 
-  /* Draws Circle */
-  ctx.fillStyle = "black";
-  ctx.textAlign = "center";
-  ctx.font = "60px Arial";
-  ctx.fillText("Army", canvas.width/2, canvas.height/2 - 43);
+	if (!blockading) {
+		/* Labels Circle */
+		ctx.fillStyle = "black";
+		ctx.textAlign = "center";
+		ctx.font = "60px Arial";
+		ctx.fillText("Army", canvas.width/2, canvas.height/2 - 43);
 
-  /* Labels # troops */
-  ctx.fillStyle = "black";
-  ctx.textAlign = "center";
-  ctx.font = "30px Arial";
-  ctx.fillText("Troops: " + army.troops, canvas.width/2, canvas.height/2 + 60);
+		/* Labels # troops */
+		ctx.fillStyle = "black";
+		ctx.textAlign = "center";
+		ctx.font = "30px Arial";
+		ctx.fillText("Troops: " + army.troops, canvas.width/2, canvas.height/2 + 60);
 
-  /* Labels # food */
-  ctx.fillStyle = "black";
-  ctx.textAlign = "center";
-  ctx.font = "30px Arial";
-  ctx.fillText("Food: " + army.food, canvas.width/2, canvas.height/2 + 90);
+		/* Labels # food */
+		ctx.fillStyle = "black";
+		ctx.textAlign = "center";
+		ctx.font = "30px Arial";
+		ctx.fillText("Food: " + army.food, canvas.width/2, canvas.height/2 + 90);
+	}
 }
 
 /* Draws all cities */
@@ -200,7 +209,7 @@ function updateCities() {
 			map.cities[i].people *= 1.001;
 
 			/* Food Increase */
-			map.cities[i].food += map.cities[i].people / 1000;
+			map.cities[i].food += map.cities[i].people / 100;
 			
 			/* Repair city */
 			if (map.cities[i].health + map.cities[i].people/750 > map.cities[i].people/25) {
@@ -208,8 +217,18 @@ function updateCities() {
 			} else {
 				map.cities[i].health += map.cities[i].people/750;
 			}
-		}
 			
+			/* Check if city has food */
+			if (map.cities[i].food <= 0) {
+				/* Options for what to do with city */
+			}
+		}
+		
+		/* City being blockaded */
+		if (citySelected > -1 && blockading) {
+			map.cities[citySelected].food -= map.cities[citySelected].people/50;
+		}
+		
 		updateTimer = new Date();
 	}
 	
@@ -234,11 +253,10 @@ function attackMenu() {
 	ctx.fillText("Attacking city " + (citySelected + 1), 10, 25);
 	
 	/* Button for blockading a city */
-	document.getElementById('blockade-button').setAttribute("style", "display: block; position: absolute; height: 105px; width: 105px; margin-left: 10px; margin-top: 35px;");
-	ctx.fillStyle = "black";
-	ctx.textAlign = "center";
-	ctx.font = "11px Arial";
-	ctx.fillText("Blockade/Starve", 60, 150);
+	document.getElementById('blockade-button').setAttribute("style", "outline:none; border-radius: 10px; display: block; position: absolute; height: 115px; width: 165px; left: 19px; top: 42px;");
+	
+	/* Button for closing menu */
+	document.getElementById('close-attack-menu-button').setAttribute("style", "outline:none; border-radius: 5px; display: block; position: absolute; height: 25px; width: 25px; right: 23px; top: 17px;");
 }
 
 /* When mouse is clicked */
@@ -262,8 +280,9 @@ document.onmouseup = function() {
 generateWorld(2000, 8000, 2000, 8000, 4000, 0, 100);
 
 function draw() {
-	/* Resets Blockade Buttons */
-	document.getElementById('blockade-button').setAttribute("style", "display: none; position: absolute; height: 105px; width: 105px; margin-left: 10px; margin-top: 35px;");
+	/* Resets all Buttons */
+	document.getElementById('blockade-button').setAttribute("style", "outline:none; border-radius: 10px; display: none; position: absolute; height: 115px; width: 165px; left: 19px; top: 42px;");
+	document.getElementById('close-attack-menu-button').setAttribute("style", "outline:none; border-radius: 5px; display: none; position: absolute; height: 25px; width: 25px; right: 23px; top: 17px;");
 	
 	/* Resize canvas to client's size */
 	canvas.width  = window.innerWidth - 25;
