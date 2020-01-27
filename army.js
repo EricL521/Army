@@ -136,28 +136,53 @@ function move() {
 /* draws player army */
 function drawArmy() {
   /* Draws Circle */
-  ctx.beginPath();
-  ctx.arc(canvas.width/2, canvas.height/2, 40, 0, 2 * Math.PI);
-  ctx.stroke();
-
 	if (!blockading) {
-		/* Labels Circle */
+  	ctx.beginPath();
+  	ctx.arc(canvas.width/2, canvas.height/2, 40, 0, 2 * Math.PI);
+  	ctx.stroke();
+	} else if (blockading) {
+		ctx.beginPath();
+  	ctx.arc(canvas.width/2, canvas.height/2, 40 * (map.cities[citySelected].people/army.troops) + 10, 0, 2 * Math.PI);
+  	ctx.stroke();
+	}
+	
+	/* Labels Circle */
+	if (!blockading) {
 		ctx.fillStyle = "black";
 		ctx.textAlign = "center";
 		ctx.font = "60px Arial";
-		ctx.fillText("Army", canvas.width/2, canvas.height/2 - 43);
+		ctx.fillText("Army", canvas.width/2, canvas.height/2 - 43);	
+	} else if (blockading) {
+		ctx.fillStyle = "black";
+		ctx.textAlign = "center";
+		ctx.font = "60px Arial";
+		ctx.fillText("Army", canvas.width/2, canvas.height/2 - 43 * (map.cities[citySelected].people/army.troops) - 43/4);	
+	}
 
-		/* Labels # troops */
+	/* Labels # troops */
+	if (!blockading) {
 		ctx.fillStyle = "black";
 		ctx.textAlign = "center";
 		ctx.font = "30px Arial";
-		ctx.fillText("Troops: " + army.troops, canvas.width/2, canvas.height/2 + 60);
+		ctx.fillText("Troops: " + Math.floor(army.troops), canvas.width/2, canvas.height/2 + 60);
+	} else if (blockading) {
+		ctx.fillStyle = "black";
+		ctx.textAlign = "center";
+		ctx.font = (map.cities[citySelected].people/army.troops) * 30 + "px Arial";
+		ctx.fillText("Troops: " + Math.floor(army.troops), canvas.width/2, canvas.height/2 + 60 * (map.cities[citySelected].people/army.troops) + 15);
+	}
 
-		/* Labels # food */
+	/* Labels # food */
+	if (!blockading) {
 		ctx.fillStyle = "black";
 		ctx.textAlign = "center";
 		ctx.font = "30px Arial";
-		ctx.fillText("Food: " + army.food, canvas.width/2, canvas.height/2 + 90);
+		ctx.fillText("Food: " + Math.floor(army.food), canvas.width/2, canvas.height/2 + 90);
+	} else if (blockading) {
+		ctx.fillStyle = "black";
+		ctx.textAlign = "center";
+		ctx.font = (map.cities[citySelected].people/army.troops) * 30 + "px Arial";
+		ctx.fillText("Food: " + Math.floor(army.food), canvas.width/2, canvas.height/2 + 90 * (map.cities[citySelected].people/army.troops) + 45/2);
 	}
 }
 
@@ -226,7 +251,14 @@ function updateCities() {
 		
 		/* City being blockaded */
 		if (citySelected > -1 && blockading) {
+			/* Removes food */
 			map.cities[citySelected].food -= map.cities[citySelected].people/50;
+			
+			/* No population growth when blockading */
+			map.cities[citySelected].people /= 1.001;
+			
+			/* Some troops die */
+			army.troops -= map.cities[citySelected].people * 0.001 / 2;
 		}
 		
 		updateTimer = new Date();
