@@ -10,13 +10,22 @@ document.write("<button onClick='infoBox = false;' id='close-info-box-button'> <
 /* Open info box button */
 document.write("<button onClick='infoBox = true;' id='open-info-box-button'> <p style='font-size: 15px; position: fixed; left: 23px; bottom: 7px;'>i</p> </button>");
 
-document.write("<div id=display-options>" +
-"<div style='display: flex;'>"
-/* Capture City Button */
-"<button>" + 
-/* Force all the people in the city to join your army & burn it down Button */
-"" + 
+document.write("<div id=display-options style='display: block; left: " + (window.innerWidth/2 - 250) + "px; top: " + (window.innerHeight/2 - 150) + "px; border-radius: 10px; position: fixed; height: 300px; width: 500px; background-color: black;'>" +
+"<div style='border-radius: 10px; position: relative; top: 1px; left: 1px; width: 498px; height: 298px; background-color: white;'>" + 
+"<h1 style='text-align: center; width: 100%; position: absolute;'> City Options </h1>" + 
+"<div style='display: flex; width: 100%; position: absolute; justify-content: space-evenly; top: 80px;'>" + 
+"<button style='outline: none; width: 200px; height: 100px; bottom: 10px; border-radius: 10px;'> <h1>Capture City</h1> </button>" + 
+"<button style='outline: none; width: 200px; height: 100px; bottom: 10px; border-radius: 10px;'> <h1>Raze City</h1> </button>" + 
 "</div>" +
+"<div style='display: flex; width: 100%; position: absolute; justify-content: space-evenly; top: 180px;'>" + 
+"<div style='width: 40%;'>" + 
+"<p>Make the city yours. It will give you food, and some people over time.</p>" + 
+"</div>" +
+"<div style='width: 40%;'>" + 
+"<p>Recruit all eligible people into your army, steal all the food, and burn the city down.</p>" + 
+"</div>" + 
+"</div>" + 
+"</div>" + 
 "</div>");
 
 /* Canvas */
