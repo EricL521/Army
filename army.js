@@ -1,12 +1,23 @@
 /* Blockade Button */
 document.write("<button onClick='blockading = true;' id='blockade-button'> <p style='font-size: 25px; margin-bottom: 5px;'>Blockade</p><p style='font-size: 25px; margin-top: 5px'>/Starve</p> </button>");
+/* Attack Wall Button */
+document.write("<button onClick='attacking = true;' id='attack-button'> <p style='font-size: 25px; margin-bottom: 5px;'>Attack</p><p style='font-size: 25px; margin-top: 5px'>City Wall</p> </button>");
 /* Close Attack Menu Button */
-document.write("<button onClick='citySelected = -1; blockading = false;' id='close-attack-menu-button'>X</button>");
+document.write("<button onClick='citySelected = -1; blockading = false; attacking = false;' id='close-attack-menu-button'>X</button>");
 
 /* Close info box button */
 document.write("<button onClick='infoBox = false;' id='close-info-box-button'> <p style='font-size: 20px; position: fixed; left: 195px; bottom: 75px;'>x</p> </button>");
 /* Open info box button */
 document.write("<button onClick='infoBox = true;' id='open-info-box-button'> <p style='font-size: 15px; position: fixed; left: 23px; bottom: 7px;'>i</p> </button>");
+
+document.write("<div id=display-options>" +
+"<div style='display: flex;'>"
+/* Capture City Button */
+"<button>" + 
+/* Force all the people in the city to join your army & burn it down Button */
+"" + 
+"</div>" +
+"</div>");
 
 /* Canvas */
 document.write("<canvas id='canvas' width='1347' height='587' style='border:2px solid black'></canvas>");
@@ -14,6 +25,9 @@ document.write("<canvas id='canvas' width='1347' height='587' style='border:2px 
 /* Sets up Canvas */
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
+
+/* Pause game */
+var pause = false;
 
 /* Update Timer */
 var updateTimer = new Date();
@@ -29,9 +43,13 @@ canvas.height = window.innerHeight - 25;
 /* City selected */
 var citySelected = -1;
 var blockading = false;
+var attacking = false;
 
 /* If info box is opened or not */
 var infoBox = true;
+
+/* display options for cities */
+var displayoptions = false;
 
 var keysPressed = [];
 
@@ -237,12 +255,18 @@ function updateCities() {
 			if (map.cities[i].health + map.cities[i].people/750 > map.cities[i].people/25) {
 				map.cities[i].health = map.cities[i].people/25;
 			} else {
-				map.cities[i].health += map.cities[i].people/750;
+				map.cities[i].health += map.cities[i].people/500;
 			}
 			
-			/* Check if city has food */
-			if (map.cities[i].food <= 0) {
+			/* Check if city is defeated */
+			if (map.cities[i].food <= 0 || map.cities[i].health <= 0) {
+				attacking = false;
+				blockading = false;
+				map.cities[i].health = 0;
+				map.cities[i].food = 0;
+				
 				/* Options for what to do with city */
+				displayoptions = true;
 			}
 		}
 		
@@ -258,8 +282,25 @@ function updateCities() {
 			army.troops -= map.cities[citySelected].people * 0.001 / 2;
 		}
 		
+		/* City being attacked */
+		if (citySelected > -1 && attacking) {
+			/* Removes health */
+			map.cities[citySelected].health -= army.troops / 250;
+			
+			/* No population growth when being attacked */
+			map.cities[citySelected].people /= 1.001;
+			
+			/* Some troops die */
+			army.troops -= map.cities[citySelected].people * 0.001 / 2;
+		}
+		
 		updateTimer = new Date();
 	}
+	
+}
+
+/* Displays options for city */
+function displayOptions(city) {
 	
 }
 
@@ -284,6 +325,9 @@ function attackMenu() {
 	/* Button for blockading a city */
 	document.getElementById('blockade-button').setAttribute("style", "outline:none; border-radius: 10px; display: block; position: absolute; height: 115px; width: 165px; left: 19px; top: 42px;");
 	
+	/* Button for attacking a city */
+	document.getElementById('attack-button').setAttribute("style", "outline:none; border-radius: 10px; display: block; position: absolute; height: 115px; width: 165px; left: 190px; top: 42px;");
+	
 	/* Button for closing menu */
 	document.getElementById('close-attack-menu-button').setAttribute("style", "outline:none; border-radius: 5px; display: block; position: absolute; height: 25px; width: 25px; right: 23px; top: 17px;");
 }
@@ -306,7 +350,7 @@ document.onmouseup = function() {
 	}
 };
 
-generateWorld(2000, 8000, 2000, 8000, 4000, 0, 100);
+generateWorld(1000, 9000, 1000, 9000, 4000, 0, 100);
 
 function draw() {
 	/* Resets all Buttons */
@@ -314,31 +358,40 @@ function draw() {
 	document.getElementById('close-attack-menu-button').setAttribute("style", "outline:none; border-radius: 5px; display: none; position: absolute; height: 25px; width: 25px; right: 23px; top: 17px;");
 	document.getElementById('close-info-box-button').setAttribute("style", "outline:none; border-radius: 5px; display: none; position: absolute; height: 20px; width: 20px; left: 190px; bottom: 95px;");
 	document.getElementById('open-info-box-button').setAttribute("style", "outline:none; border-radius: 5px; display: block; position: absolute; height: 20px; width: 20px; left: 15px; bottom: 20px;");
+	document.getElementById('attack-button').setAttribute("style", "outline:none; border-radius: 10px; display: none; position: absolute; height: 115px; width: 165px; left: 190px; top: 42px;");
 	
 	/* Resize canvas to client's size */
 	canvas.width  = window.innerWidth - 25;
 	canvas.height = window.innerHeight - 25;
 	
+	if (!pause) {
   /* Clears Canvas */
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+		
+		/* Draws Cities */
+		drawCities();
 
-  /* Draws Cities */
-  drawCities();
-	
-	/* Updates Cities */
-	updateCities();
+		/* Updates Cities */
+		updateCities();
 
-  /* Draws army */
-  drawArmy();
+		/* Draws army */
+		drawArmy();
 
-  /* Moves your army */
-  move();
-	
-	/* Draw info box */
-	drawInfoBox();
-	
-	if (citySelected >= 0) {
-		attackMenu();
+		/* Moves your army */
+		move();
+
+		/* Draw info box */
+		drawInfoBox();
+
+		/* Draws attack menu */
+		if (citySelected >= 0) {
+			attackMenu();
+		}
+		
+		/* displays options for cities */
+		if (displayoptions) {
+			displayOptions();
+		}
 	}
 	
   requestAnimationFrame(draw);
