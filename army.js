@@ -10,23 +10,33 @@ document.write("<button onClick='infoBox = false;' id='close-info-box-button'> <
 /* Open info box button */
 document.write("<button onClick='infoBox = true;' id='open-info-box-button'> <p style='font-size: 15px; position: fixed; left: 23px; bottom: 7px;'>i</p> </button>");
 
-document.write("<div id=display-options style='display: block; left: " + (window.innerWidth/2 - 250) + "px; top: " + (window.innerHeight/2 - 150) + "px; border-radius: 10px; position: fixed; height: 300px; width: 500px; background-color: black;'>" +
-"<div style='border-radius: 10px; position: relative; top: 1px; left: 1px; width: 498px; height: 298px; background-color: white;'>" + 
-"<h1 style='text-align: center; width: 100%; position: absolute;'> City Options </h1>" + 
-"<div style='display: flex; width: 100%; position: absolute; justify-content: space-evenly; top: 80px;'>" + 
-"<button style='outline: none; width: 200px; height: 100px; bottom: 10px; border-radius: 10px;'> <h1>Capture City</h1> </button>" + 
-"<button style='outline: none; width: 200px; height: 100px; bottom: 10px; border-radius: 10px;'> <h1>Raze City</h1> </button>" + 
-"</div>" +
-"<div style='display: flex; width: 100%; position: absolute; justify-content: space-evenly; top: 180px;'>" + 
-"<div style='width: 40%;'>" + 
-"<p>Make the city yours. It will give you food, and some people over time.</p>" + 
-"</div>" +
-"<div style='width: 40%;'>" + 
-"<p>Recruit all eligible people into your army, steal all the food, and burn the city down.</p>" + 
-"</div>" + 
-"</div>" + 
-"</div>" + 
-"</div>");
+/* Pause/Play button */
+document.write("<div id='time-controls' style='display: flex; width: 100px; height: 25px; border: 1px solid black; justify-content: space-evenly;'>" +
+							 "<button onClick=' var el = document.getElementById(\'pause-play-button\'); if (el.innerTEXT = \'||\') {el.innerTEXT = \'\u1405\';} else {el.innerTEXT=\'||\';}' style='position: block; width: 25px; height: 25px;'> <p id='pause-play-button' style='position: absolute; top: 0px; font-weight: bold;'>||</p> </button>" + 
+							 /*"<button style='position: block; width: 25px; height: 25px;'> <p id='pause-play-button' style='position: absolute; top: 0px; font-weight: lighter; margin-left: -6px;'>\u1405\u1405</p> </button>" + 
+						*/ "" + 
+							 "" + 
+							 "" + 
+							 "</div>");
+
+/* Capture City Alert */
+document.write("<div id=display-options style='display: none; left: " + (window.innerWidth/2 - 250) + "px; top: " + (window.innerHeight/2 - 150) + "px; border-radius: 10px; position: fixed; height: 300px; width: 500px; background-color: black;'>" +
+							 "<div style='border-radius: 10px; position: relative; top: 1px; left: 1px; width: 498px; height: 298px; background-color: white;'>" + 
+							 "<h1 style='margin-top: -6px; font-size: 60px; text-align: center; width: 100%; position: absolute;'> City Options </h1>" + 
+							 "<div style='display: flex; width: 100%; position: absolute; justify-content: space-evenly; top: 80px;'>" + 
+							 "<button style='outline: none; width: 200px; height: 100px; bottom: 10px; border-radius: 10px;'> <h1>Capture City</h1> </button>" + 
+							 "<button style='outline: none; width: 200px; height: 100px; bottom: 10px; border-radius: 10px;'> <h1>Raze City</h1> </button>" + 
+							 "</div>" +
+							 "<div style='display: flex; width: 100%; position: absolute; justify-content: space-evenly; top: 180px;'>" + 
+							 "<div style='width: 40%;'>" + 
+							 "<p>Make the city yours. It will give you food and some troops over time.</p>" + 
+							 "</div>" +
+							 "<div style='width: 40%;'>" + 
+							 "<p>Recruit all eligible people into your army, steal all the food, and burn the city down.</p>" + 
+							 "</div>" + 
+							 "</div>" + 
+							 "</div>" + 
+							 "</div>");
 
 /* Canvas */
 document.write("<canvas id='canvas' width='1347' height='587' style='border:2px solid black'></canvas>");
@@ -271,11 +281,11 @@ function updateCities() {
 			if (map.cities[i].food <= 0 || map.cities[i].health <= 0) {
 				attacking = false;
 				blockading = false;
+				
+				
+				
 				map.cities[i].health = 0;
 				map.cities[i].food = 0;
-				
-				/* Options for what to do with city */
-				displayoptions = true;
 			}
 		}
 		
@@ -294,22 +304,17 @@ function updateCities() {
 		/* City being attacked */
 		if (citySelected > -1 && attacking) {
 			/* Removes health */
-			map.cities[citySelected].health -= army.troops / 250;
+			map.cities[citySelected].health -= army.troops / 500;
 			
 			/* No population growth when being attacked */
 			map.cities[citySelected].people /= 1.001;
 			
 			/* Some troops die */
-			army.troops -= map.cities[citySelected].people * 0.001 / 2;
+			army.troops -= map.cities[citySelected].people * 0.001;
 		}
 		
 		updateTimer = new Date();
 	}
-	
-}
-
-/* Displays options for city */
-function displayOptions(city) {
 	
 }
 
@@ -374,8 +379,8 @@ function draw() {
 	canvas.height = window.innerHeight - 25;
 	
 	if (!pause) {
-  /* Clears Canvas */
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  	/* Clears Canvas */
+  	ctx.clearRect(0, 0, canvas.width, canvas.height);
 		
 		/* Draws Cities */
 		drawCities();
@@ -396,11 +401,29 @@ function draw() {
 		if (citySelected >= 0) {
 			attackMenu();
 		}
+	} else if (pause) {
+		/* Clears Canvas */
+  	ctx.clearRect(0, 0, canvas.width, canvas.height);
 		
-		/* displays options for cities */
-		if (displayoptions) {
-			displayOptions();
+		/* Draws Cities */
+		drawCities();
+
+		/* Draws army */
+		drawArmy();
+
+		/* Draws attack menu */
+		if (citySelected >= 0) {
+			attackMenu();
 		}
+		
+		/* Draws grey box */
+		ctx.globalAlpha = 0.25;
+		ctx.fillStyle = "grey";
+		ctx.fillRect(0, 0, canvas.width, canvas.height);
+		ctx.globalAlpha = 1;
+		
+		/* Draw info box */
+		drawInfoBox();
 	}
 	
   requestAnimationFrame(draw);
