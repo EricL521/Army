@@ -48,8 +48,8 @@ var ctx = canvas.getContext('2d');
 /* Pause game */
 var pause = false;
 
-/* Update Timer */
-var updateTimer = new Date();
+/* Used to determine time since last frame */
+var timeSinceLastFrame = new Date();
 
 /* Mouse coords */
 var mouseX = 0;
@@ -260,9 +260,8 @@ function drawCities() {
 
 /* Updates Cities */
 function updateCities() {
-	/* Timer for 1 second */
-	if (new Date() - updateTimer > 1000) {
-
+	/* If game is not paused */
+	if (!pause) {
 		for (var i = 0; i < map.cities.length; i ++) {
 			/* Population Growth */
 			map.cities[i].people *= 1.001;
@@ -281,8 +280,6 @@ function updateCities() {
 			if (map.cities[i].food <= 0 || map.cities[i].health <= 0) {
 				attacking = false;
 				blockading = false;
-
-
 
 				map.cities[i].health = 0;
 				map.cities[i].food = 0;
@@ -313,9 +310,10 @@ function updateCities() {
 			army.troops -= map.cities[citySelected].people * 0.001;
 		}
 
-		updateTimer = new Date();
 	}
 
+	/* Timer for 1 second */
+	setTimeout(updateCities, 1000);
 }
 
 /* Attack menu */
@@ -385,9 +383,6 @@ function draw() {
 		/* Draws Cities */
 		drawCities();
 
-		/* Updates Cities */
-		updateCities();
-
 		/* Draws army */
 		drawArmy();
 
@@ -426,7 +421,10 @@ function draw() {
 		drawInfoBox();
 	}
 
+	timeSinceLastFrame = new Date();
+
   requestAnimationFrame(draw);
 }
 
 draw();
+updateCities();
