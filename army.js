@@ -22,10 +22,10 @@ document.write("<div id='time-controls' style='position: fixed; right: 10px; bot
 /* Capture City Alert */
 document.write("<div id=display-options style='display: none; left: " + (window.innerWidth/2 - 250) + "px; top: " + (window.innerHeight/2 - 150) + "px; border-radius: 10px; position: fixed; height: 300px; width: 500px; background-color: black;'>" +
 							 "<div style='border-radius: 10px; position: relative; top: 1px; left: 1px; width: 498px; height: 298px; background-color: white;'>" +
-							 "<h1 style='margin-top: -6px; font-size: 60px; text-align: center; width: 100%; position: absolute;'> City Options </h1>" +
+							 "<h1 style='margin-top: 0px; font-size: 60px; text-align: center; width: 100%; position: absolute;'> City Options </h1>" +
 							 "<div style='display: flex; width: 100%; position: absolute; justify-content: space-evenly; top: 80px;'>" +
 							 "<button style='outline: none; width: 200px; height: 100px; bottom: 10px; border-radius: 10px;'> <h1>Capture City</h1> </button>" +
-							 "<button style='outline: none; width: 200px; height: 100px; bottom: 10px; border-radius: 10px;'> <h1>Raze City</h1> </button>" +
+							 "<button onClick=\"document.getElementById('display-options').setAttribute('style', 'display: none; left: ' + (window.innerWidth/2 - 250) + 'px; top: ' + (window.innerHeight/2 - 150) + 'px; border-radius: 10px; position: fixed; height: 300px; width: 500px; background-color: black;'); pause = false; army.troops += map.cities[citySelected].people/3; army.food += map.cities[citySelected].food; map.cities.splice(citySelected, 1); citySelected = -1;\" style='outline: none; width: 200px; height: 100px; bottom: 10px; border-radius: 10px;'> <h1>Raze City</h1> </button>" +
 							 "</div>" +
 							 "<div style='display: flex; width: 100%; position: absolute; justify-content: space-evenly; top: 180px;'>" +
 							 "<div style='width: 40%;'>" +
@@ -276,14 +276,6 @@ function updateCities() {
 				map.cities[i].health += map.cities[i].people/500;
 			}
 
-			/* Check if city is defeated */
-			if (map.cities[i].food <= 0 || map.cities[i].health <= 0) {
-				attacking = false;
-				blockading = false;
-
-				map.cities[i].health = 0;
-				map.cities[i].food = 0;
-			}
 		}
 
 		/* City being blockaded */
@@ -310,6 +302,20 @@ function updateCities() {
 			army.troops -= map.cities[citySelected].people * 0.001;
 		}
 
+		/* Check if city is defeated */
+		if (citySelected > -1 && (map.cities[citySelected].food <= 0 || map.cities[citySelected].health <= 0)) {
+			attacking = false;
+			blockading = false;
+
+			map.cities[citySelected].health = map.cities[citySelected].people/25;
+			if (map.cities[citySelected].food < 0) {
+				map.cities[citySelected].food = 0;
+			}
+
+			/* Pauses Game and Brings up menu */
+			pause = true;
+			document.getElementById('display-options').setAttribute("style", "display: block; left: " + (window.innerWidth/2 - 250) + "px; top: " + (window.innerHeight/2 - 150) + "px; border-radius: 10px; position: fixed; height: 300px; width: 500px; background-color: black;");
+		}
 	}
 
 	/* Timer for 1 second */
