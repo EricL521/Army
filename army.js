@@ -394,6 +394,9 @@ function draw() {
 		/* Moves your army */
 		move();
 
+		/* Soldiers eat food */
+		army.food -= army.troops/50000;
+
 		/* Draw info box */
 		drawInfoBox();
 
