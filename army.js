@@ -11,31 +11,31 @@ document.write("<button onClick='infoBox = false;' id='close-info-box-button'> <
 document.write("<button onClick='infoBox = true;' id='open-info-box-button'> <p style='font-size: 15px; position: fixed; left: 23px; bottom: 7px;'>i</p> </button>");
 
 /* Pause/Play button */
-document.write("<div id='time-controls' style='display: flex; width: 100px; height: 25px; border: 1px solid black; justify-content: space-evenly;'>" +
-							 "<button onClick=' var el = document.getElementById(\'pause-play-button\'); if (el.innerTEXT = \'||\') {el.innerTEXT = \'\u1405\';} else {el.innerTEXT=\'||\';}' style='position: block; width: 25px; height: 25px;'> <p id='pause-play-button' style='position: absolute; top: 0px; font-weight: bold;'>||</p> </button>" + 
-							 /*"<button style='position: block; width: 25px; height: 25px;'> <p id='pause-play-button' style='position: absolute; top: 0px; font-weight: lighter; margin-left: -6px;'>\u1405\u1405</p> </button>" + 
-						*/ "" + 
-							 "" + 
-							 "" + 
+document.write("<div id='time-controls' style='position: fixed; right: 10px; bottom: 20px; display: flex; width: 50px; height: 25px; justify-content: space-evenly;'>" +
+							 "<button onClick=\"pause = !pause; var el = document.getElementById('pause-play-button'); if (el.innerText == '||') {el.innerText = '\u1405'; el.setAttribute('style', 'position: absolute; top: 0px; font-weight: lighter; margin-left: 0px; margin-top: 4px;');} else {el.innerText='||'; el.setAttribute('style', 'position: absolute; top: 0px; font-weight: bold; margin-left: 1px; margin-top: 5px;');}\" style='position: block; width: 25px; height: 25px;'> <p id='pause-play-button' style='position: absolute; top: 0px; font-weight: bold; margin-left: 1px; margin-top: 5px;'>||</p> </button>" +
+							 /*"<button style='position: block; width: 25px; height: 25px;'> <p id='pause-play-button' style='position: absolute; top: 0px; font-weight: lighter; margin-left: -6px;'>\u1405\u1405</p> </button>" +
+						*/ "" +
+							 "" +
+							 "" +
 							 "</div>");
 
 /* Capture City Alert */
 document.write("<div id=display-options style='display: none; left: " + (window.innerWidth/2 - 250) + "px; top: " + (window.innerHeight/2 - 150) + "px; border-radius: 10px; position: fixed; height: 300px; width: 500px; background-color: black;'>" +
-							 "<div style='border-radius: 10px; position: relative; top: 1px; left: 1px; width: 498px; height: 298px; background-color: white;'>" + 
-							 "<h1 style='margin-top: -6px; font-size: 60px; text-align: center; width: 100%; position: absolute;'> City Options </h1>" + 
-							 "<div style='display: flex; width: 100%; position: absolute; justify-content: space-evenly; top: 80px;'>" + 
-							 "<button style='outline: none; width: 200px; height: 100px; bottom: 10px; border-radius: 10px;'> <h1>Capture City</h1> </button>" + 
-							 "<button style='outline: none; width: 200px; height: 100px; bottom: 10px; border-radius: 10px;'> <h1>Raze City</h1> </button>" + 
+							 "<div style='border-radius: 10px; position: relative; top: 1px; left: 1px; width: 498px; height: 298px; background-color: white;'>" +
+							 "<h1 style='margin-top: -6px; font-size: 60px; text-align: center; width: 100%; position: absolute;'> City Options </h1>" +
+							 "<div style='display: flex; width: 100%; position: absolute; justify-content: space-evenly; top: 80px;'>" +
+							 "<button style='outline: none; width: 200px; height: 100px; bottom: 10px; border-radius: 10px;'> <h1>Capture City</h1> </button>" +
+							 "<button style='outline: none; width: 200px; height: 100px; bottom: 10px; border-radius: 10px;'> <h1>Raze City</h1> </button>" +
 							 "</div>" +
-							 "<div style='display: flex; width: 100%; position: absolute; justify-content: space-evenly; top: 180px;'>" + 
-							 "<div style='width: 40%;'>" + 
-							 "<p>Make the city yours. It will give you food and some troops over time.</p>" + 
+							 "<div style='display: flex; width: 100%; position: absolute; justify-content: space-evenly; top: 180px;'>" +
+							 "<div style='width: 40%;'>" +
+							 "<p>Make the city yours. It will give you food and some troops over time.</p>" +
 							 "</div>" +
-							 "<div style='width: 40%;'>" + 
-							 "<p>Recruit all eligible people into your army, steal all the food, and burn the city down.</p>" + 
-							 "</div>" + 
-							 "</div>" + 
-							 "</div>" + 
+							 "<div style='width: 40%;'>" +
+							 "<p>Recruit all eligible people into your army, steal all the food, and burn the city down.</p>" +
+							 "</div>" +
+							 "</div>" +
+							 "</div>" +
 							 "</div>");
 
 /* Canvas */
@@ -173,7 +173,7 @@ function move() {
 		if (keysPressed[37]) {
 			army.x -= 2;
 		}
-	
+
 	}
 }
 
@@ -185,7 +185,7 @@ function drawInfoBox() {
 		ctx.beginPath();
 		ctx.rect(6, canvas.height - 6 - 98, 198, 98);
 		ctx.stroke();
-		
+
 		/* Labels # troops */
 		ctx.fillStyle = "black";
 		ctx.textAlign = "left";
@@ -197,10 +197,10 @@ function drawInfoBox() {
 		ctx.textAlign = "left";
 		ctx.font = "30px Arial";
 		ctx.fillText("• Food: " + Math.floor(army.food), 10, canvas.height - 60);
-		
+
 		/* Button for closing menu */
 		document.getElementById('close-info-box-button').setAttribute("style", "outline:none; border-radius: 5px; display: block; position: absolute; height: 20px; width: 20px; left: 190px; bottom: 95px;");
-		
+
 		/* Disbable button for opening menu */
 		document.getElementById('open-info-box-button').setAttribute("style", "outline:none; border-radius: 5px; display: none; position: absolute; height: 20px; width: 20px; left: 15px; bottom: 20px;");
 	}
@@ -248,7 +248,7 @@ function drawCities() {
       /* Food */
       ctx.font = 20 * (map.cities[i].people/army.troops) + "px Arial";
       ctx.fillText(Math.floor(map.cities[i].food) + " food", (map.cities[i].x - army.x)/army.troops * 1000 + canvas.width/2, (map.cities[i].y - army.y)/army.troops * 1000 + canvas.height/2 + 77 * (map.cities[i].people/army.troops));
-    	
+
 			/* Health Bar */
 			ctx.fillStyle = "red";
 			ctx.fillRect((map.cities[i].x - army.x)/army.troops * 1000 + canvas.width/2 - 50 * (map.cities[i].people/army.troops), (map.cities[i].y - army.y)/army.troops * 1000 + canvas.height/2 - 40 * (map.cities[i].people/army.troops) - 18 * (map.cities[i].people/army.troops), 100 * (map.cities[i].people/army.troops), 15 * (map.cities[i].people/army.troops));
@@ -262,60 +262,60 @@ function drawCities() {
 function updateCities() {
 	/* Timer for 1 second */
 	if (new Date() - updateTimer > 1000) {
-	
+
 		for (var i = 0; i < map.cities.length; i ++) {
 			/* Population Growth */
 			map.cities[i].people *= 1.001;
 
 			/* Food Increase */
 			map.cities[i].food += map.cities[i].people / 100;
-			
+
 			/* Repair city */
 			if (map.cities[i].health + map.cities[i].people/750 > map.cities[i].people/25) {
 				map.cities[i].health = map.cities[i].people/25;
 			} else {
 				map.cities[i].health += map.cities[i].people/500;
 			}
-			
+
 			/* Check if city is defeated */
 			if (map.cities[i].food <= 0 || map.cities[i].health <= 0) {
 				attacking = false;
 				blockading = false;
-				
-				
-				
+
+
+
 				map.cities[i].health = 0;
 				map.cities[i].food = 0;
 			}
 		}
-		
+
 		/* City being blockaded */
 		if (citySelected > -1 && blockading) {
 			/* Removes food */
 			map.cities[citySelected].food -= map.cities[citySelected].people/50;
-			
+
 			/* No population growth when blockading */
 			map.cities[citySelected].people /= 1.001;
-			
+
 			/* Some troops die */
 			army.troops -= map.cities[citySelected].people * 0.001 / 2;
 		}
-		
+
 		/* City being attacked */
 		if (citySelected > -1 && attacking) {
 			/* Removes health */
 			map.cities[citySelected].health -= army.troops / 500;
-			
+
 			/* No population growth when being attacked */
 			map.cities[citySelected].people /= 1.001;
-			
+
 			/* Some troops die */
 			army.troops -= map.cities[citySelected].people * 0.001;
 		}
-		
+
 		updateTimer = new Date();
 	}
-	
+
 }
 
 /* Attack menu */
@@ -323,25 +323,25 @@ function attackMenu() {
 	/* Move your army to city */
 	army.x = map.cities[citySelected].x;
 	army.y = map.cities[citySelected].y;
-	
+
 	/* Box for menu */
 	ctx.clearRect(5, 5, canvas.width - 10, 150);
 	ctx.beginPath();
 	ctx.rect(5, 5, canvas.width - 10, 150);
 	ctx.stroke();
-	
+
 	/* City you're attacking */
 	ctx.fillStyle = "black";
 	ctx.textAlign = "left";
   ctx.font = "20px Arial";
 	ctx.fillText("Attacking city " + (citySelected + 1), 10, 25);
-	
+
 	/* Button for blockading a city */
 	document.getElementById('blockade-button').setAttribute("style", "outline:none; border-radius: 10px; display: block; position: absolute; height: 115px; width: 165px; left: 19px; top: 42px;");
-	
+
 	/* Button for attacking a city */
 	document.getElementById('attack-button').setAttribute("style", "outline:none; border-radius: 10px; display: block; position: absolute; height: 115px; width: 165px; left: 190px; top: 42px;");
-	
+
 	/* Button for closing menu */
 	document.getElementById('close-attack-menu-button').setAttribute("style", "outline:none; border-radius: 5px; display: block; position: absolute; height: 25px; width: 25px; right: 23px; top: 17px;");
 }
@@ -355,11 +355,11 @@ document.onmouseup = function() {
       (map.cities[i].x - army.x)/army.troops * 1000 + canvas.width/2 < canvas.width + 100 &&
       (map.cities[i].y - army.y)/army.troops * 1000 + canvas.height/2 > - 100 &&
       (map.cities[i].y - army.y)/army.troops * 1000 + canvas.height/2 < canvas.height + 100) {
-			
+
 			if (Math.sqrt(Math.pow((map.cities[i].x - army.x)/army.troops * 1000, 2) + Math.pow((map.cities[i].y - army.y)/army.troops * 1000, 2)) < 40 + 40 * (map.cities[i].people/army.troops) && Math.sqrt(Math.pow((map.cities[i].x - army.x)/army.troops * 1000 + canvas.width/2 - mouseX, 2) + Math.pow((map.cities[i].y - army.y)/army.troops * 1000 - mouseY + canvas.height/2, 2)) < 40 * (map.cities[i].people/army.troops)) {
 					citySelected = i;
 			}
-			
+
 		}
 	}
 };
@@ -373,15 +373,15 @@ function draw() {
 	document.getElementById('close-info-box-button').setAttribute("style", "outline:none; border-radius: 5px; display: none; position: absolute; height: 20px; width: 20px; left: 190px; bottom: 95px;");
 	document.getElementById('open-info-box-button').setAttribute("style", "outline:none; border-radius: 5px; display: block; position: absolute; height: 20px; width: 20px; left: 15px; bottom: 20px;");
 	document.getElementById('attack-button').setAttribute("style", "outline:none; border-radius: 10px; display: none; position: absolute; height: 115px; width: 165px; left: 190px; top: 42px;");
-	
+
 	/* Resize canvas to client's size */
 	canvas.width  = window.innerWidth - 25;
 	canvas.height = window.innerHeight - 25;
-	
+
 	if (!pause) {
   	/* Clears Canvas */
   	ctx.clearRect(0, 0, canvas.width, canvas.height);
-		
+
 		/* Draws Cities */
 		drawCities();
 
@@ -404,7 +404,7 @@ function draw() {
 	} else if (pause) {
 		/* Clears Canvas */
   	ctx.clearRect(0, 0, canvas.width, canvas.height);
-		
+
 		/* Draws Cities */
 		drawCities();
 
@@ -415,17 +415,17 @@ function draw() {
 		if (citySelected >= 0) {
 			attackMenu();
 		}
-		
+
 		/* Draws grey box */
 		ctx.globalAlpha = 0.25;
 		ctx.fillStyle = "grey";
 		ctx.fillRect(0, 0, canvas.width, canvas.height);
 		ctx.globalAlpha = 1;
-		
+
 		/* Draw info box */
 		drawInfoBox();
 	}
-	
+
   requestAnimationFrame(draw);
 }
 
