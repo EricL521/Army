@@ -12,7 +12,7 @@ document.write("<button onClick='infoBox = true;' id='open-info-box-button'> <p 
 
 /* Pause/Play button */
 document.write("<div id='time-controls' style='position: fixed; right: 10px; bottom: 20px; display: flex; width: 50px; height: 25px; justify-content: space-evenly;'>" +
-							 "<button onClick=\"pause = !pause; var el = document.getElementById('pause-play-button'); if (el.innerText == '||') {el.innerText = '\u1405'; el.setAttribute('style', 'position: absolute; top: 0px; font-weight: lighter; margin-left: 0px; margin-top: 4px;');} else {el.innerText='||'; el.setAttribute('style', 'position: absolute; top: 0px; font-weight: bold; margin-left: 1px; margin-top: 5px;');}\" style='position: block; width: 25px; height: 25px;'> <p id='pause-play-button' style='position: absolute; top: 0px; font-weight: bold; margin-left: 1px; margin-top: 5px;'>||</p> </button>" +
+							 "<button onClick=\"pause = !pause; var el = document.getElementById('pause-play-button'); if (el.innerText == '||') {el.innerText = '\u1405'; el.setAttribute('style', 'position: absolute; top: 0px; font-weight: lighter; margin-left: 0px; margin-top: 4px;');} else {el.innerText='||'; el.setAttribute('style', 'position: absolute; top: 0px; font-weight: bold; margin-left: 1px; margin-top: 5px;');}\" style='outline: none; border-radius: 5px; position: block; width: 25px; height: 25px;'> <p id='pause-play-button' style='position: absolute; top: 0px; font-weight: bold; margin-left: 1px; margin-top: 5px;'>||</p> </button>" +
 							 /*"<button style='position: block; width: 25px; height: 25px;'> <p id='pause-play-button' style='position: absolute; top: 0px; font-weight: lighter; margin-left: -6px;'>\u1405\u1405</p> </button>" +
 						*/ "" +
 							 "" +
