@@ -12,7 +12,7 @@ document.write("<button onClick='infoBox = true;' id='open-info-box-button'> <p 
 
 /* Pause/Play button */
 document.write("<div id='time-controls' style='position: fixed; right: 10px; bottom: 20px; display: flex; width: 50px; height: 25px; justify-content: space-evenly;'>" +
-	"<button onClick=\"pause = !pause; var el = document.getElementById('pause-play-button'); if (el.innerText == '||') {el.innerText = '\u1405'; el.setAttribute('style', 'position: absolute; top: 0px; font-weight: lighter; margin-left: 0px; margin-top: 4px;');} else {el.innerText='||'; el.setAttribute('style', 'position: absolute; top: 0px; font-weight: bold; margin-left: 1px; margin-top: 5px;');}\" style='outline: none; border-radius: 5px; position: block; width: 25px; height: 25px;'> <p id='pause-play-button' style='position: absolute; top: 0px; font-weight: bold; margin-left: 1px; margin-top: 5px;'>||</p> </button>" +
+	"<button id='pause-play-button-real' onClick=\"pause = !pause; var el = document.getElementById('pause-play-button'); if (el.innerText == '||') {el.innerText = '\u1405'; el.setAttribute('style', 'position: absolute; top: 0px; font-weight: lighter; margin-left: 0px; margin-top: 4px;');} else {el.innerText='||'; el.setAttribute('style', 'position: absolute; top: 0px; font-weight: bold; margin-left: 1px; margin-top: 5px;');}\" style='outline: none; border-radius: 5px; position: block; width: 25px; height: 25px;'> <p id='pause-play-button' style='position: absolute; top: 0px; font-weight: bold; margin-left: 1px; margin-top: 5px;'>||</p> </button>" +
 	/*"<button style='position: block; width: 25px; height: 25px;'> <p id='pause-play-button' style='position: absolute; top: 0px; font-weight: lighter; margin-left: -6px;'>\u1405\u1405</p> </button>" +
 	*/ "" +
 	"" +
@@ -25,7 +25,7 @@ document.write("<div id=display-options style='display: none; left: " + (window.
 	"<h1 style='margin-top: 0px; font-size: 60px; text-align: center; width: 100%; position: absolute;'> City Options </h1>" +
 	"<div style='display: flex; width: 100%; position: absolute; justify-content: space-evenly; top: 80px;'>" +
 	"<button style='outline: none; width: 200px; height: 100px; bottom: 10px; border-radius: 10px;'> <h1>Capture City</h1> </button>" +
-	"<button onClick=\"document.getElementById('display-options').setAttribute('style', 'display: none; left: ' + (window.innerWidth/2 - 250) + 'px; top: ' + (window.innerHeight/2 - 150) + 'px; border-radius: 10px; position: fixed; height: 300px; width: 500px; background-color: black;'); pause = false; army.troops += map.cities[citySelected].people/15; army.food += map.cities[citySelected].food; map.cities.splice(citySelected, 1); citySelected = -1;\" style='outline: none; width: 200px; height: 100px; bottom: 10px; border-radius: 10px;'> <h1>Raze City</h1> </button>" +
+	"<button onClick=\"document.getElementById('pause-play-button-real').disabled = false; document.getElementById('display-options').setAttribute('style', 'display: none; left: ' + (window.innerWidth/2 - 250) + 'px; top: ' + (window.innerHeight/2 - 150) + 'px; border-radius: 10px; position: fixed; height: 300px; width: 500px; background-color: black;'); pause = false; army.troops += map.cities[citySelected].people/15; army.food += map.cities[citySelected].food; map.cities.splice(citySelected, 1); citySelected = -1;\" style='outline: none; width: 200px; height: 100px; bottom: 10px; border-radius: 10px;'> <h1>Raze City</h1> </button>" +
 	"</div>" +
 	"<div style='display: flex; width: 100%; position: absolute; justify-content: space-evenly; top: 180px;'>" +
 	"<div style='width: 40%;'>" +
@@ -272,7 +272,7 @@ function updateCities() {
 			if (map.cities[i].health + map.cities[i].people/750 > map.cities[i].people/25) {
 				map.cities[i].health = map.cities[i].people/25;
 			} else {
-				map.cities[i].health += map.cities[i].people/500;
+				map.cities[i].health += map.cities[i].people/1000;
 			}
 
 		}
@@ -314,6 +314,7 @@ function updateCities() {
 			/* Pauses Game and Brings up menu */
 			pause = true;
 			document.getElementById('display-options').setAttribute("style", "display: block; left: " + (window.innerWidth/2 - 250) + "px; top: " + (window.innerHeight/2 - 150) + "px; border-radius: 10px; position: fixed; height: 300px; width: 500px; background-color: black;");
+			document.getElementById('pause-play-button-real').disabled = true;
 		}
 	}
 
@@ -360,7 +361,7 @@ document.onmouseup = function() {
 			(map.cities[i].y - army.y)/500 * 1000 + canvas.height/2 < canvas.height + 100) {
 
 			if (Math.sqrt(Math.pow((map.cities[i].x - army.x)/500 * 1000, 2) + Math.pow((map.cities[i].y - army.y)/500 * 1000, 2)) < 40 + 40 * (25/40) && Math.sqrt(Math.pow((map.cities[i].x - army.x)/500 * 1000 + canvas.width/2 - mouseX, 2) + Math.pow((map.cities[i].y - army.y)/500 * 1000 - mouseY + canvas.height/2, 2)) < 40 * (25/40)) {
-					citySelected = i;
+				citySelected = i;
 			}
 
 		}
