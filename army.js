@@ -38,6 +38,13 @@ document.write("<div id=display-options style='display: none; left: " + (window.
 	"</div>" +
 	"</div>");
 
+/* Pause game when unloaded */
+window.onblur = function () {
+  pause = true;
+	document.getElementById('pause-play-button').innerText = "\u1405";
+	document.getElementById('pause-play-button').setAttribute('style', 'position: absolute; top: 0px; font-weight: lighter; margin-left: 0px; margin-top: 4px;');
+};
+
 /* Canvas */
 document.write("<canvas id='canvas' width='1347' height='587' style='border:2px solid black'></canvas>");
 
