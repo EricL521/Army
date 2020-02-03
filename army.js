@@ -12,7 +12,7 @@ document.write("<button onClick='infoBox = true;' id='open-info-box-button'> <p 
 
 /* Pause/Play button */
 document.write("<div id='time-controls' style='position: fixed; right: 10px; bottom: 20px; display: flex; width: 50px; height: 25px; justify-content: space-evenly;'>" +
-	"<button id='pause-play-button-real' onClick=\"pause = !pause; var el = document.getElementById('pause-play-button'); if (el.innerText == '||') {el.innerText = '\u1405'; el.setAttribute('style', 'position: absolute; top: 0px; font-weight: lighter; margin-left: 0px; margin-top: 4px;');} else {el.innerText='||'; el.setAttribute('style', 'position: absolute; top: 0px; font-weight: bold; margin-left: 1px; margin-top: 5px;');}\" style='outline: none; border-radius: 5px; position: block; width: 25px; height: 25px;'> <p id='pause-play-button' style='position: absolute; top: 0px; font-weight: bold; margin-left: 1px; margin-top: 5px;'>||</p> </button>" +
+	"<button id='pause-play-button-real' onClick=\"pause = !pause; var el = document.getElementById('pause-play-button'); if (el.innerText == '||') {el.innerText = '\u1405'; el.setAttribute('style', 'position: absolute; top: 0px; font-weight: lighter; margin-left: 0px; margin-top: 4px;');} else {el.innerText='||'; el.setAttribute('style', 'position: absolute; top: 0px; font-weight: bold; margin-left: 0px; margin-top: 3px;');}\" style='outline: none; border-radius: 5px; position: block; width: 25px; height: 25px;'> <p id='pause-play-button' style='position: absolute; top: 0px; font-weight: bold; margin-left: 0px; margin-top: 3px;'>||</p> </button>" +
 	/*"<button style='position: block; width: 25px; height: 25px;'> <p id='pause-play-button' style='position: absolute; top: 0px; font-weight: lighter; margin-left: -6px;'>\u1405\u1405</p> </button>" +
 	*/ "" +
 	"" +
@@ -63,8 +63,8 @@ var mouseX = 0;
 var mouseY = 0;
 
 /* Letters */
-var consonants = ['q', 'w', 'r', 't', 'y', 'p', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'z', 'x', 'c', 'v', 'b', 'n', 'm'];
-var vowels =['a', 'e', 'i', 'o', 'u'] ;
+var consonants = ['ph', 'gl', 'st', 'cr', 'q', 'w', 'r', 't', 'y', 'p', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'z', 'x', 'c', 'v', 'b', 'n', 'm'];
+var vowels =['a', 'e', 'i', 'o', 'u', 'ai'] ;
 
 /* Resize canvas to client's size */
 canvas.width	= window.innerWidth - 25;
@@ -137,8 +137,10 @@ function generateWorld(minX, maxX, minY, maxY, numCities, numArmies, minDistance
 			x: (Math.random() * (maxX - minX)) + minX,
 			y: (Math.random() * (maxY - minY)) + minY,
 			health: people/25 /* people/25 is max health */,
-			name: "" + consonants[Math.floor(Math.random() * (consonants.length - 1))].toUpperCase() + vowels[Math.floor(Math.random() * (vowels.length - 1))] + consonants[Math.floor(Math.random() * (consonants.length - 1))] + vowels[Math.floor(Math.random() * (vowels.length - 1))] + consonants[Math.floor(Math.random() * (consonants.length - 1))] /* consonant, vowel, consonant, vowel, consonant */
+			name: "" + consonants[Math.floor(Math.random() * (consonants.length - 1))] + vowels[Math.floor(Math.random() * (vowels.length - 1))] + consonants[Math.floor(Math.random() * (consonants.length - 1))] + vowels[Math.floor(Math.random() * (vowels.length - 1))] + consonants[Math.floor(Math.random() * (consonants.length - 1))]
 		});
+		
+		map.cities[i].name = map.cities[i].name.charAt(0).toUpperCase() + map.cities[i].name.slice(1);
 	}
 
 	/* Deletes cities that are too close to each other */
