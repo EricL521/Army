@@ -137,6 +137,7 @@ function generateWorld(minX, maxX, minY, maxY, numCities, numArmies, minDistance
 			x: (Math.random() * (maxX - minX)) + minX,
 			y: (Math.random() * (maxY - minY)) + minY,
 			health: people/25 /* people/25 is max health */,
+			fps: Math.random() * 250 + 1000 /* Food per second */, 
 			name: "" + consonants[Math.floor(Math.random() * (consonants.length - 1))] + vowels[Math.floor(Math.random() * (vowels.length - 1))] + consonants[Math.floor(Math.random() * (consonants.length - 1))] + vowels[Math.floor(Math.random() * (vowels.length - 1))] + consonants[Math.floor(Math.random() * (consonants.length - 1))]
 		});
 		
@@ -275,7 +276,16 @@ function updateCities() {
 			map.cities[i].people *= 1.001;
 
 			/* Food Increase */
-			map.cities[i].food += map.cities[i].people / 100;
+			map.cities[i].food += (10000 * map.cities[i].fps - 1750000000/map.cities[i].people) / 2500000;
+			
+			/* Food Eaten */
+			map.cities[i].food -= (map.cities[i].people * 3) / 2500000;
+			
+			/* Starvation */
+			if (map.cities[i].food < 10000) {
+				map.cities[i].people += (map.cities[i].food / 3) * 2500000 / 500;
+				map.cities[i].food = 10000;
+			}
 
 			/* Repair city */
 			if (map.cities[i].health + map.cities[i].people/750 > map.cities[i].people/25) {
@@ -303,8 +313,8 @@ function updateCities() {
 			/* Removes health */
 			map.cities[citySelected].health -= army.troops / 500;
 
-			/* No population growth when being attacked */
-			map.cities[citySelected].people /= 1.001;
+			/* Population declines */
+			map.cities[citySelected].people /= 1.002;
 
 			/* Some troops die */
 			army.troops -= map.cities[citySelected].people * 0.001;
