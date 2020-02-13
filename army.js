@@ -67,7 +67,7 @@ var consonants = ['ph', 'gl', 'st', 'cr', 'q', 'w', 'r', 't', 'y', 'p', 's', 'd'
 var vowels =['a', 'e', 'i', 'o', 'u', 'ai'] ;
 
 /* Resize canvas to client's size */
-canvas.width	= window.innerWidth - 25;
+canvas.width = window.innerWidth - 25;
 canvas.height = window.innerHeight - 25;
 
 /* City selected */
@@ -389,7 +389,7 @@ document.onmouseup = function() {
 			(map.cities[i].y - army.y)/500 * 1000 + canvas.height/2 > - 100 &&
 			(map.cities[i].y - army.y)/500 * 1000 + canvas.height/2 < canvas.height + 100) {
 
-			if (Math.sqrt(Math.pow((map.cities[i].x - army.x)/500 * 1000, 2) + Math.pow((map.cities[i].y - army.y)/500 * 1000, 2)) < 40 + 40 * (25/40) && Math.sqrt(Math.pow((map.cities[i].x - army.x)/500 * 1000 + canvas.width/2 - mouseX, 2) + Math.pow((map.cities[i].y - army.y)/500 * 1000 - mouseY + canvas.height/2, 2)) < 40 * (25/40)) {
+			if (map.cities[i].team != "player" && Math.sqrt(Math.pow((map.cities[i].x - army.x)/500 * 1000, 2) + Math.pow((map.cities[i].y - army.y)/500 * 1000, 2)) < 40 + 40 * (25/40) && Math.sqrt(Math.pow((map.cities[i].x - army.x)/500 * 1000 + canvas.width/2 - mouseX, 2) + Math.pow((map.cities[i].y - army.y)/500 * 1000 - mouseY + canvas.height/2, 2)) < 40 * (25/40)) {
 				citySelected = i;
 			}
 
