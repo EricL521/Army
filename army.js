@@ -78,9 +78,6 @@ var attacking = false;
 /* If info box is opened or not */
 var infoBox = true;
 
-/* display options for cities */
-var displayoptions = false;
-
 var keysPressed = [];
 
 /* Player's army */
@@ -242,7 +239,9 @@ function drawCities() {
 			/* Draws Circles at Cities */
 			ctx.beginPath();
 			ctx.arc((map.cities[i].x - army.x)/500 * 1000 + canvas.width/2, (map.cities[i].y - army.y)/500 * 1000 + canvas.height/2, 40 * (25/40), 0, 2 * Math.PI);
-			ctx.fillStyle = "green";
+			ctx.fillStyle = "grey";
+			if (map.cities[i].team == "player") {ctx.fillStyle = "green";}
+			else if (map.cities[i].team != "neutral") {ctx.fillStyle = "red";}
 			ctx.fill();
 
 			/*	Text to label cities */
@@ -262,7 +261,9 @@ function drawCities() {
 			/* Health Bar */
 			ctx.fillStyle = "red";
 			ctx.fillRect((map.cities[i].x - army.x)/500 * 1000 + canvas.width/2 - 50 * (25/40), (map.cities[i].y - army.y)/500 * 1000 + canvas.height/2 - 40 * (25/40) - 18 * (25/40), 100 * (25/40), 15 * (25/40));
-			ctx.fillStyle = "green";
+			ctx.fillStyle = "grey";
+			if (map.cities[i].team == "player") {ctx.fillStyle = "green";}
+			else if (map.cities[i].team != "neutral") {ctx.fillStyle = "red";}
 			ctx.fillRect((map.cities[i].x - army.x)/500 * 1000 + canvas.width/2 - 50 * (25/40), (map.cities[i].y - army.y)/500 * 1000 + canvas.height/2 - 40 * (25/40) - 18 * (25/40), 100 * (25/40) * map.cities[i].health / (map.cities[i].people/25), 15 * (25/40));
 		}
 	}
@@ -322,6 +323,10 @@ function updateCities() {
 
 			/* Some troops die */
 			army.troops -= map.cities[citySelected].people * 0.001;
+		}
+		
+		if (map.cities[citySelected].health > map.cities[citySelected].people / 25) {
+			map.cities[citySelected].health = map.cities[citySelected].people / 25;
 		}
 
 		/* Check if city is defeated */
