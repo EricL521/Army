@@ -24,7 +24,7 @@ document.write("<div id=display-options style='display: none; left: " + (window.
 	"<div style='border-radius: 10px; position: relative; top: 1px; left: 1px; width: 498px; height: 298px; background-color: white;'>" +
 	"<h1 style='margin-top: 0px; font-size: 60px; text-align: center; width: 100%; position: absolute;'> City Options </h1>" +
 	"<div style='display: flex; width: 100%; position: absolute; justify-content: space-evenly; top: 80px;'>" +
-	"<button style='outline: none; width: 200px; height: 100px; bottom: 10px; border-radius: 10px;'> <h1>Capture City</h1> </button>" +
+	"<button onClick=\"document.getElementById('pause-play-button-real').disabled = false; document.getElementById('display-options').setAttribute('style', 'display: none; left: ' + (window.innerWidth/2 - 250) + 'px; top: ' + (window.innerHeight/2 - 150) + 'px; border-radius: 10px; position: fixed; height: 300px; width: 500px; background-color: black;'); pause = false; map.cities[citySelected].team='player'; citySelected = -1;\" style='outline: none; width: 200px; height: 100px; bottom: 10px; border-radius: 10px;'> <h1>Capture City</h1> </button>" +
 	"<button onClick=\"document.getElementById('pause-play-button-real').disabled = false; document.getElementById('display-options').setAttribute('style', 'display: none; left: ' + (window.innerWidth/2 - 250) + 'px; top: ' + (window.innerHeight/2 - 150) + 'px; border-radius: 10px; position: fixed; height: 300px; width: 500px; background-color: black;'); pause = false; army.troops += map.cities[citySelected].people/15; army.food += map.cities[citySelected].food; map.cities.splice(citySelected, 1); citySelected = -1;\" style='outline: none; width: 200px; height: 100px; bottom: 10px; border-radius: 10px;'> <h1>Raze City</h1> </button>" +
 	"</div>" +
 	"<div style='display: flex; width: 100%; position: absolute; justify-content: space-evenly; top: 180px;'>" +
@@ -40,7 +40,7 @@ document.write("<div id=display-options style='display: none; left: " + (window.
 
 /* Pause game when unloaded */
 window.onblur = function () {
-  pause = true;
+	pause = true;
 	document.getElementById('pause-play-button').innerText = "\u1405";
 	document.getElementById('pause-play-button').setAttribute('style', 'position: absolute; top: 0px; font-weight: lighter; margin-left: 0px; margin-top: 4px;');
 };
@@ -138,6 +138,7 @@ function generateWorld(minX, maxX, minY, maxY, numCities, numArmies, minDistance
 			y: (Math.random() * (maxY - minY)) + minY,
 			health: people/25 /* people/25 is max health */,
 			fps: Math.random() * 250 + 1000 /* Food per second */, 
+			team: "neutral",
 			name: "" + consonants[Math.floor(Math.random() * (consonants.length - 1))] + vowels[Math.floor(Math.random() * (vowels.length - 1))] + consonants[Math.floor(Math.random() * (consonants.length - 1))] + vowels[Math.floor(Math.random() * (vowels.length - 1))] + consonants[Math.floor(Math.random() * (consonants.length - 1))]
 		});
 		
@@ -272,26 +273,29 @@ function updateCities() {
 	/* If game is not paused */
 	if (!pause) {
 		for (var i = 0; i < map.cities.length; i ++) {
+			/* Pay food to owner */
+			if (map.cities[i].team == "player") {
+				army.food += (10000/map.cities[i].people + 5) * 0.05;
+				map.cities[i].food -= (10000/map.cities[i].people + 5) * 0.05;
+			}
+			
 			/* Population Growth */
-			map.cities[i].people *= 1.001;
+			map.cities[i].people *= 1.00001 + 50/map.cities[i].people;
 
 			/* Food Increase */
-			map.cities[i].food += (10000 * map.cities[i].fps - 1750000000/map.cities[i].people) / 2500000;
-			
-			/* Food Eaten */
-			map.cities[i].food -= (map.cities[i].people * 3) / 2500000;
-			
-			/* Starvation */
-			if (map.cities[i].food < 10000) {
-				map.cities[i].people += (map.cities[i].food / 3) * 2500000 / 500;
-				map.cities[i].food = 10000;
-			}
+			map.cities[i].food += 10000/map.cities[i].people + 5;
 
 			/* Repair city */
 			if (map.cities[i].health + map.cities[i].people/750 > map.cities[i].people/25) {
 				map.cities[i].health = map.cities[i].people/25;
 			} else {
 				map.cities[i].health += map.cities[i].people/1000;
+			}
+			
+			/* Pay people to owner */
+			if (map.cities[i].team == "player") {
+				army.troops += ((1.0001 + 50/map.cities[i].people) * map.cities[i].people - map.cities[i].people) * 0.05;
+				map.cities[i].people -= ((1.0001 + 50/map.cities[i].people) * map.cities[i].people - map.cities[i].people) * 0.05;
 			}
 
 		}
@@ -302,7 +306,7 @@ function updateCities() {
 			map.cities[citySelected].food -= map.cities[citySelected].people/50;
 
 			/* No population growth when blockading */
-			map.cities[citySelected].people /= 1.001;
+			map.cities[citySelected].people /= 1.00001 + 50/map.cities[citySelected].people;
 
 			/* Some troops die */
 			army.troops -= map.cities[citySelected].people * 0.001 / 2;
@@ -314,7 +318,7 @@ function updateCities() {
 			map.cities[citySelected].health -= army.troops / 500;
 
 			/* Population declines */
-			map.cities[citySelected].people /= 1.002;
+			map.cities[citySelected].people /= 1 + 1.1 * (0.00001 + 50/map.cities[citySelected].people);
 
 			/* Some troops die */
 			army.troops -= map.cities[citySelected].people * 0.001;
