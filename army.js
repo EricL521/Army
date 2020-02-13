@@ -325,7 +325,8 @@ function updateCities() {
 			army.troops -= map.cities[citySelected].people * 0.001;
 		}
 		
-		if (map.cities[citySelected].health > map.cities[citySelected].people / 25) {
+		/* If city health > city health max, set city health to max */
+		if (citySelected > -1 && map.cities[citySelected].health > map.cities[citySelected].people / 25) {
 			map.cities[citySelected].health = map.cities[citySelected].people / 25;
 		}
 
