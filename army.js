@@ -1,10 +1,3 @@
-/* Blockade Button */
-document.write("<button onClick='blockading = true;' id='blockade-button'> <p style='font-size: 25px; margin-bottom: 5px;'>Blockade</p><p style='font-size: 25px; margin-top: 5px'>/Starve</p> </button>");
-/* Attack Wall Button */
-document.write("<button onClick='attacking = true;' id='attack-button'> <p style='font-size: 25px; margin-bottom: 5px;'>Attack</p><p style='font-size: 25px; margin-top: 5px'>City Wall</p> </button>");
-/* Close Attack Menu Button */
-document.write("<button onClick='citySelected = -1; blockading = false; attacking = false;' id='close-attack-menu-button'>X</button>");
-
 /* Close info box button */
 document.write("<button onClick='infoBox = false;' id='close-info-box-button'> <p style='font-size: 20px; position: fixed; left: 195px; bottom: 75px;'>x</p> </button>");
 /* Open info box button */
@@ -55,6 +48,10 @@ var ctx = canvas.getContext('2d');
 /* Pause game */
 var pause = false;
 
+/* Arrays for troops and city guards */
+var armyTroops = [];
+var cityTroops = [];
+
 /* Used to determine time since last frame */
 var timeSinceLastFrame = new Date();
 
@@ -72,8 +69,6 @@ canvas.height = window.innerHeight - 25;
 
 /* City selected */
 var citySelected = -1;
-var blockading = false;
-var attacking = false;
 
 /* If info box is opened or not */
 var infoBox = true;
@@ -134,11 +129,11 @@ function generateWorld(minX, maxX, minY, maxY, numCities, numArmies, minDistance
 			x: (Math.random() * (maxX - minX)) + minX,
 			y: (Math.random() * (maxY - minY)) + minY,
 			health: people/25 /* people/25 is max health */,
-			fps: Math.random() * 250 + 1000 /* Food per second */, 
+			fps: Math.random() * 250 + 1000 /* Food per second */,
 			team: "neutral",
 			name: "" + consonants[Math.floor(Math.random() * (consonants.length - 1))] + vowels[Math.floor(Math.random() * (vowels.length - 1))] + consonants[Math.floor(Math.random() * (consonants.length - 1))] + vowels[Math.floor(Math.random() * (vowels.length - 1))] + consonants[Math.floor(Math.random() * (consonants.length - 1))]
 		});
-		
+
 		map.cities[i].name = map.cities[i].name.charAt(0).toUpperCase() + map.cities[i].name.slice(1);
 	}
 
@@ -279,7 +274,7 @@ function updateCities() {
 				army.food += (10000/map.cities[i].people + 5) * 0.05;
 				map.cities[i].food -= (10000/map.cities[i].people + 5) * 0.05;
 			}
-			
+
 			/* Population Growth */
 			map.cities[i].people *= 1.00001 + 50/map.cities[i].people;
 
@@ -292,7 +287,7 @@ function updateCities() {
 			} else {
 				map.cities[i].health += map.cities[i].people/1000;
 			}
-			
+
 			/* Pay people to owner */
 			if (map.cities[i].team == "player") {
 				army.troops += ((1.0001 + 50/map.cities[i].people) * map.cities[i].people - map.cities[i].people) * 0.05;
@@ -301,39 +296,8 @@ function updateCities() {
 
 		}
 
-		/* City being blockaded */
-		if (citySelected > -1 && blockading) {
-			/* Removes food */
-			map.cities[citySelected].food -= map.cities[citySelected].people/50;
-
-			/* No population growth when blockading */
-			map.cities[citySelected].people /= 1.00001 + 50/map.cities[citySelected].people;
-
-			/* Some troops die */
-			army.troops -= map.cities[citySelected].people * 0.001 / 2;
-		}
-
-		/* City being attacked */
-		if (citySelected > -1 && attacking) {
-			/* Removes health */
-			map.cities[citySelected].health -= army.troops / 500;
-
-			/* Population declines */
-			map.cities[citySelected].people /= 1 + 1.1 * (0.00001 + 50/map.cities[citySelected].people);
-
-			/* Some troops die */
-			army.troops -= map.cities[citySelected].people * 0.001;
-		}
-		
-		/* If city health > city health max, set city health to max */
-		if (citySelected > -1 && map.cities[citySelected].health > map.cities[citySelected].people / 25) {
-			map.cities[citySelected].health = map.cities[citySelected].people / 25;
-		}
-
 		/* Check if city is defeated */
 		if (citySelected > -1 && (map.cities[citySelected].food <= 0 || map.cities[citySelected].health <= 0)) {
-			attacking = false;
-			blockading = false;
 
 			map.cities[citySelected].health = map.cities[citySelected].people/25;
 			if (map.cities[citySelected].food < 0) {
@@ -351,32 +315,26 @@ function updateCities() {
 	setTimeout(updateCities, 1000);
 }
 
-/* Attack menu */
-function attackMenu() {
-	/* Move your army to city */
-	army.x = map.cities[citySelected].x;
-	army.y = map.cities[citySelected].y;
+/* Update Attack screen */
+function updateAttackMenu() {
 
-	/* Box for menu */
-	ctx.clearRect(5, 5, canvas.width - 10, 150);
-	ctx.beginPath();
-	ctx.rect(5, 5, canvas.width - 10, 150);
-	ctx.stroke();
+}
 
-	/* City you're attacking */
-	ctx.fillStyle = "black";
-	ctx.textAlign = "left";
-	ctx.font = "20px Arial";
-	ctx.fillText("Attacking: " + map.cities[citySelected].name, 10, 25);
+/* Draw Attack menu */
+function drawAttackMenu() {
+	for (troop in armyTroops) {
+		ctx.beginPath();
+		ctx.arc(troop.x, troop.y, 10, 0, 2 * Math.PI);
+		ctx.fillStyle = "green";
+		ctx.fill();
+	}
 
-	/* Button for blockading a city */
-	document.getElementById('blockade-button').setAttribute("style", "outline:none; border-radius: 10px; display: block; position: absolute; height: 115px; width: 165px; left: 19px; top: 42px;");
-
-	/* Button for attacking a city */
-	document.getElementById('attack-button').setAttribute("style", "outline:none; border-radius: 10px; display: block; position: absolute; height: 115px; width: 165px; left: 190px; top: 42px;");
-
-	/* Button for closing menu */
-	document.getElementById('close-attack-menu-button').setAttribute("style", "outline:none; border-radius: 5px; display: block; position: absolute; height: 25px; width: 25px; right: 23px; top: 17px;");
+	for (troop in cityTroops) {
+		ctx.beginPath();
+		ctx.arc(troop.x, troop.y, 10, 0, 2 * Math.PI);
+		ctx.fillStyle = "red";
+		ctx.fill();
+	}
 }
 
 /* When mouse is clicked */
@@ -395,17 +353,40 @@ document.onmouseup = function() {
 
 		}
 	}
+
+	if (citySelected > -1) {
+		/* resets arrays */
+		armyTroops = [];
+		cityTroops = [];
+
+		/* sets up army array */
+		for (var i = 0; i < army.troops / 50; i ++) {
+			armyTroops.push({x: 12, y: (Math.random() * (canvas.height - 22)) + 11, targeting: -1, shootTimer: new Date()});
+		}
+
+		/* sets up city array */
+		for (var i = 0; i < map.cities[citySelected].people * 0.05 / 50; i ++) {
+			cityTroops.push({x: canvas.width - 12, y: (Math.random() * (canvas.height - 22)) + 11, targeting: -1, shootTimer: new Date()});
+		}
+
+		/* sets up army array */
+		for (var i = 0; i < armyTroops.length; i ++) {
+			armyTroops[i].targeting = Math.floor(Math.random() * cityTroops.length);
+		}
+
+		/* sets up city array */
+		for (var i = 0; i < cityTroops.length; i ++) {
+			cityTroops[i].targeting = Math.floor(Math.random() * armyTroops.length);
+		}
+	}
 };
 
 generateWorld(1000, 9000, 1000, 9000, 4000, 0, 100);
 
 function draw() {
 	/* Resets all Buttons */
-	document.getElementById('blockade-button').setAttribute("style", "outline:none; border-radius: 10px; display: none; position: absolute; height: 115px; width: 165px; left: 19px; top: 42px;");
-	document.getElementById('close-attack-menu-button').setAttribute("style", "outline:none; border-radius: 5px; display: none; position: absolute; height: 25px; width: 25px; right: 23px; top: 17px;");
 	document.getElementById('close-info-box-button').setAttribute("style", "outline:none; border-radius: 5px; display: none; position: absolute; height: 20px; width: 20px; left: 190px; bottom: 95px;");
 	document.getElementById('open-info-box-button').setAttribute("style", "outline:none; border-radius: 5px; display: block; position: absolute; height: 20px; width: 20px; left: 15px; bottom: 20px;");
-	document.getElementById('attack-button').setAttribute("style", "outline:none; border-radius: 10px; display: none; position: absolute; height: 115px; width: 165px; left: 190px; top: 42px;");
 
 	/* Resize canvas to client's size */
 	canvas.width = window.innerWidth - 25;
@@ -415,38 +396,45 @@ function draw() {
 		/* Clears Canvas */
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-		/* Draws Cities */
-		drawCities();
+		if (citySelected == -1) {
+			/* Draws Cities */
+			drawCities();
 
-		/* Draws army */
-		drawArmy();
+			/* Draws army */
+			drawArmy();
 
-		/* Moves your army */
-		move();
+			/* Moves your army */
+			move();
 
-		/* Soldiers eat food */
-		army.food -= army.troops/50000;
+			/* Soldiers eat food */
+			army.food -= army.troops/50000;
 
-		/* Draw info box */
-		drawInfoBox();
-
-		/* Draws attack menu */
-		if (citySelected >= 0) {
-			attackMenu();
+			/* Draw info box */
+			drawInfoBox();
 		}
+
+		if (citySelected > -1) {
+			updateAttackMenu();
+			drawAttackMenu();
+		}
+
 	} else if (pause) {
 		/* Clears Canvas */
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-		/* Draws Cities */
-		drawCities();
+		if (citySelected == -1) {
+			/* Draws Cities */
+			drawCities();
 
-		/* Draws army */
-		drawArmy();
+			/* Draw info box */
+			drawInfoBox();
 
-		/* Draws attack menu */
-		if (citySelected >= 0) {
-			attackMenu();
+			/* Draws army */
+			drawArmy();
+		}
+
+		if (citySelected > -1) {
+			drawAttackMenu();
 		}
 
 		/* Draws grey box */
@@ -454,9 +442,6 @@ function draw() {
 		ctx.fillStyle = "grey";
 		ctx.fillRect(0, 0, canvas.width, canvas.height);
 		ctx.globalAlpha = 1;
-
-		/* Draw info box */
-		drawInfoBox();
 	}
 
 	timeSinceLastFrame = new Date();
