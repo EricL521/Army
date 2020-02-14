@@ -317,19 +317,45 @@ function updateCities() {
 
 /* Update Attack screen */
 function updateAttackMenu() {
-
+	for (var i = 0; i < armyTroops.length; i ++) {
+		var troop = armyTroops[i];
+		/* a-dif in x, b-dif in y, c-hyp */
+		var a = cityTroops[troop.targeting].x - troop.x;
+		var b = cityTroops[troop.targeting].y - troop.y;
+		var c = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
+		
+		/* move troop */
+		troop.x += 5 * (a/c);
+		troop.y += 5 * (b/c);
+	}
+	
+	for (var i = 0; i < cityTroops.length; i ++) {
+		var troop = cityTroops[i];
+		/* a-dif in x, b-dif in y, c-hyp */
+		var a = armyTroops[troop.targeting].x - troop.x;
+		var b = armyTroops[troop.targeting].y - troop.y;
+		var c = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
+		
+		/* move troop */
+		troop.x += 5 * (a/c);
+		troop.y += 5 * (b/c);
+	}
 }
 
 /* Draw Attack menu */
 function drawAttackMenu() {
-	for (troop in armyTroops) {
+	for (var i = 0; i < armyTroops.length; i ++) {
+		var troop = armyTroops[i];
+		
 		ctx.beginPath();
 		ctx.arc(troop.x, troop.y, 10, 0, 2 * Math.PI);
 		ctx.fillStyle = "green";
 		ctx.fill();
 	}
 
-	for (troop in cityTroops) {
+	for (var i = 0; i < cityTroops.length; i ++) {
+		var troop = cityTroops[i];
+		
 		ctx.beginPath();
 		ctx.arc(troop.x, troop.y, 10, 0, 2 * Math.PI);
 		ctx.fillStyle = "red";
@@ -354,7 +380,7 @@ document.onmouseup = function() {
 		}
 	}
 
-	if (citySelected > -1) {
+	if (citySelected > -1 && (armyTroops == [] || cityTroops == [])) {
 		/* resets arrays */
 		armyTroops = [];
 		cityTroops = [];
