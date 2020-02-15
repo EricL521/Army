@@ -318,15 +318,34 @@ function updateCities() {
 /* Update Attack screen */
 function updateAttackMenu() {
 	for (var i = 0; i < armyTroops.length; i ++) {
-		var troop = armyTroops[i];
-		/* a-dif in x, b-dif in y, c-hyp */
-		var a = cityTroops[troop.targeting].x - troop.x;
-		var b = cityTroops[troop.targeting].y - troop.y;
-		var c = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
+		/* If targeting is not in range */
+		if (Math.sqrt(Math.pow(troop.x - cityTroops[troop.targeting].x, 2) + Math.pow(troop.y - cityTroops[troop.targeting].y, 2)) > troop.range) {
+			var troop = armyTroops[i];
+			/* a-dif in x, b-dif in y, c-hyp */
+			var a = cityTroops[troop.targeting].x - troop.x;
+			var b = cityTroops[troop.targeting].y - troop.y;
+			var c = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
+
+			/* move troop */
+			troop.x += 3 * (a/c);
+			troop.y += 3 * (b/c);
+		}
 		
-		/* move troop */
-		troop.x += 5 * (a/c);
-		troop.y += 5 * (b/c);
+		if (new Date() - troop.shootTimer > 5000 && Math.sqrt(Math.pow(troop.x - cityTroops[troop.targeting].x, 2) + Math.pow(troop.y - cityTroops[troop.targeting].y, 2)) < troop.range) {
+			/* Shoot */
+			cityTroops[troop.targeting].health -= troop.damage;
+			
+			if (cityTroops[troop.targeting].health <= 0) {
+				/* compensate for splicing */
+				for (var j = troop.targeting; j < armyTroops.length; j ++) {
+					armyTroops[j].targeting -= 1;
+				}
+				
+				cityTroops.splice(troop.targeting, 1);
+				
+				troop.targeting = Math.floor(Math.random() * cityTroops.length);
+			}
+		}
 	}
 	
 	for (var i = 0; i < cityTroops.length; i ++) {
@@ -337,8 +356,8 @@ function updateAttackMenu() {
 		var c = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
 		
 		/* move troop */
-		troop.x += 5 * (a/c);
-		troop.y += 5 * (b/c);
+		troop.x += 3 * (a/c);
+		troop.y += 3 * (b/c);
 	}
 }
 
@@ -380,19 +399,19 @@ document.onmouseup = function() {
 		}
 	}
 
-	if (citySelected > -1 && (armyTroops == [] || cityTroops == [])) {
+	if (citySelected > -1 && (armyTroops.length == 0 || cityTroops.length == 0)) {
 		/* resets arrays */
 		armyTroops = [];
 		cityTroops = [];
 
 		/* sets up army array */
 		for (var i = 0; i < army.troops / 50; i ++) {
-			armyTroops.push({x: 12, y: (Math.random() * (canvas.height - 22)) + 11, targeting: -1, shootTimer: new Date()});
+			armyTroops.push({x: 12, y: (Math.random() * (canvas.height - 22)) + 11, health: 100, damage: 10, targeting: -1, shootTimer: new Date(), range: 100});
 		}
 
 		/* sets up city array */
 		for (var i = 0; i < map.cities[citySelected].people * 0.05 / 50; i ++) {
-			cityTroops.push({x: canvas.width - 12, y: (Math.random() * (canvas.height - 22)) + 11, targeting: -1, shootTimer: new Date()});
+			cityTroops.push({x: canvas.width - 12, y: (Math.random() * (canvas.height - 22)) + 11, health: 100, damage: 20, targeting: -1, shootTimer: new Date(), range: 150});
 		}
 
 		/* sets up army array */
