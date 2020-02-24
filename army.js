@@ -317,68 +317,171 @@ function updateCities() {
 
 /* Update Attack screen */
 function updateAttackMenu() {
-	for (var i = 0; i < armyTroops.length; i ++) {
-		/* If targeting is not in range */
-		if (Math.sqrt(Math.pow(troop.x - cityTroops[troop.targeting].x, 2) + Math.pow(troop.y - cityTroops[troop.targeting].y, 2)) > troop.range) {
-			var troop = armyTroops[i];
-			/* a-dif in x, b-dif in y, c-hyp */
-			var a = cityTroops[troop.targeting].x - troop.x;
-			var b = cityTroops[troop.targeting].y - troop.y;
-			var c = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
 
-			/* move troop */
-			troop.x += 3 * (a/c);
-			troop.y += 3 * (b/c);
-		}
-		
-		if (new Date() - troop.shootTimer > 5000 && Math.sqrt(Math.pow(troop.x - cityTroops[troop.targeting].x, 2) + Math.pow(troop.y - cityTroops[troop.targeting].y, 2)) < troop.range) {
-			/* Shoot */
-			cityTroops[troop.targeting].health -= troop.damage;
-			
-			if (cityTroops[troop.targeting].health <= 0) {
-				/* compensate for splicing */
-				for (var j = troop.targeting; j < armyTroops.length; j ++) {
-					armyTroops[j].targeting -= 1;
+	/* If city is still defending */
+	if (cityTroops.length > 0) {
+
+		for (var i = 0; i < armyTroops.length; i ++) {
+			if (armyTroops.length > 0 && cityTroops.length > 0) {
+
+				var troop = armyTroops[i];
+
+				/* If targeting is not in range */
+				if (Math.sqrt(Math.pow(troop.x - cityTroops[troop.targeting].x, 2) + Math.pow(troop.y - cityTroops[troop.targeting].y, 2)) > troop.range) {
+					/* a-dif in x, b-dif in y, c-hyp */
+					var a = cityTroops[troop.targeting].x - troop.x;
+					var b = cityTroops[troop.targeting].y - troop.y;
+					var c = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
+
+					/* move troop */
+					troop.x += 3 * (a/c);
+					troop.y += 3 * (b/c);
 				}
-				
-				cityTroops.splice(troop.targeting, 1);
-				
-				troop.targeting = Math.floor(Math.random() * cityTroops.length);
+
+				if (new Date() - troop.shootTimer > 5000 && Math.sqrt(Math.pow(troop.x - cityTroops[troop.targeting].x, 2) + Math.pow(troop.y - cityTroops[troop.targeting].y, 2)) < troop.range) {
+					/* Shoot */
+					cityTroops[troop.targeting].health -= troop.damage;
+
+					/* Move backwards */
+					var a = cityTroops[troop.targeting].x - troop.x;
+					var b = cityTroops[troop.targeting].y - troop.y;
+					var c = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
+
+					troop.x += -50 * (a/c);
+					troop.y += -50 * (b/c);
+
+					if (cityTroops[troop.targeting].health <= 0) {
+						/* compensate for splicing */
+						for (var j = 0; j < armyTroops.length; j ++) {
+							if (armyTroops[j].targeting > troop.targeting) {
+								armyTroops[j].targeting --;
+							}
+						}
+
+						cityTroops.splice(troop.targeting, 1);
+
+						for (var j = 0; j < armyTroops.length; j ++) {
+							if (armyTroops[j].targeting < 0) {
+								armyTroops[j].targeting = 0;
+							}
+
+							if (armyTroops[j].targeting >= cityTroops.length) {
+								armyTroops[j].targeting = cityTroops.length - 1;
+							}
+						}
+
+						troop.targeting = Math.floor(Math.random() * cityTroops.length);
+					}
+
+					troop.shootTimer = new Date();
+				}
+
 			}
 		}
+
+		for (var i = 0; i < cityTroops.length; i ++) {
+			if (armyTroops.length > 0 && cityTroops.length > 0) {
+
+				var troop = cityTroops[i];
+
+				/* If targeting is not in range */
+				if (Math.sqrt(Math.pow(troop.x - armyTroops[troop.targeting].x, 2) + Math.pow(troop.y - armyTroops[troop.targeting].y, 2)) > troop.range) {
+					/* a-dif in x, b-dif in y, c-hyp */
+					var a = armyTroops[troop.targeting].x - troop.x;
+					var b = armyTroops[troop.targeting].y - troop.y;
+					var c = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
+
+					/* move troop */
+					troop.x += 3 * (a/c);
+					troop.y += 3 * (b/c);
+				}
+
+				if (new Date() - troop.shootTimer > 5000 && Math.sqrt(Math.pow(troop.x - armyTroops[troop.targeting].x, 2) + Math.pow(troop.y - armyTroops[troop.targeting].y, 2)) < troop.range) {
+					/* Shoot */
+					armyTroops[troop.targeting].health -= troop.damage;
+
+					/* Move backwards */
+					var a = armyTroops[troop.targeting].x - troop.x;
+					var b = armyTroops[troop.targeting].y - troop.y;
+					var c = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
+
+					troop.x += -50 * (a/c);
+					troop.y += -50 * (b/c);
+
+					if (armyTroops[troop.targeting].health <= 0) {
+						/* compensate for splicing */
+						for (var j = 0; j < cityTroops.length; j ++) {
+							if (cityTroops[j].targeting >= troop.targeting) {
+								cityTroops[j].targeting --;
+							}
+						}
+
+						armyTroops.splice(troop.targeting, 1);
+
+						for (var j = 0; j < cityTroops.length; j ++) {
+							if (cityTroops[j].targeting < 0) {
+								cityTroops[j].targeting = 0;
+							}
+
+							if (cityTroops[j].targeting >= armyTroops.length) {
+								cityTroops[j].targeting = armyTroops.length - 1;
+							}
+						}
+
+						troop.targeting = Math.floor(Math.random() * cityTroops.length);
+					}
+
+					troop.shootTimer = new Date();
+				}
+
+			}
+		}
+
 	}
-	
-	for (var i = 0; i < cityTroops.length; i ++) {
-		var troop = cityTroops[i];
-		/* a-dif in x, b-dif in y, c-hyp */
-		var a = armyTroops[troop.targeting].x - troop.x;
-		var b = armyTroops[troop.targeting].y - troop.y;
-		var c = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
+
+	if (armyTroops.length < 0) {
+		/* Lost */
+
+		citySelected = -1;
+
+		troops /= 1.5;
+	}
+
+	if (cityTroops.length < 0) {
+		/* Blockade or Attack Wall */
 		
-		/* move troop */
-		troop.x += 3 * (a/c);
-		troop.y += 3 * (b/c);
+
+
+		updateAttackCity();
 	}
+}
+
+function updateAttackCity() {
+
 }
 
 /* Draw Attack menu */
 function drawAttackMenu() {
-	for (var i = 0; i < armyTroops.length; i ++) {
-		var troop = armyTroops[i];
-		
-		ctx.beginPath();
-		ctx.arc(troop.x, troop.y, 10, 0, 2 * Math.PI);
-		ctx.fillStyle = "green";
-		ctx.fill();
-	}
+	if (cityTroops.length > 0) {
 
-	for (var i = 0; i < cityTroops.length; i ++) {
-		var troop = cityTroops[i];
-		
-		ctx.beginPath();
-		ctx.arc(troop.x, troop.y, 10, 0, 2 * Math.PI);
-		ctx.fillStyle = "red";
-		ctx.fill();
+		for (var i = 0; i < armyTroops.length; i ++) {
+			var troop = armyTroops[i];
+
+			ctx.beginPath();
+			ctx.arc(troop.x, troop.y, 10, 0, 2 * Math.PI);
+			ctx.fillStyle = "green";
+			ctx.fill();
+		}
+
+		for (var i = 0; i < cityTroops.length; i ++) {
+			var troop = cityTroops[i];
+
+			ctx.beginPath();
+			ctx.arc(troop.x, troop.y, 10, 0, 2 * Math.PI);
+			ctx.fillStyle = "red";
+			ctx.fill();
+		}
+
 	}
 }
 
@@ -406,12 +509,12 @@ document.onmouseup = function() {
 
 		/* sets up army array */
 		for (var i = 0; i < army.troops / 50; i ++) {
-			armyTroops.push({x: 12, y: (Math.random() * (canvas.height - 22)) + 11, health: 100, damage: 10, targeting: -1, shootTimer: new Date(), range: 100});
+			armyTroops.push({x: 12, y: (Math.random() * (canvas.height - 22)) + 11, health: 100, damage: 10, targeting: -1, shootTimer: new Date(), range: 250});
 		}
 
 		/* sets up city array */
 		for (var i = 0; i < map.cities[citySelected].people * 0.05 / 50; i ++) {
-			cityTroops.push({x: canvas.width - 12, y: (Math.random() * (canvas.height - 22)) + 11, health: 100, damage: 20, targeting: -1, shootTimer: new Date(), range: 150});
+			cityTroops.push({x: canvas.width - 12, y: (Math.random() * (canvas.height - 22)) + 11, health: 100, damage: 20, targeting: -1, shootTimer: new Date(), range: 250});
 		}
 
 		/* sets up army array */
