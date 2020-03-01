@@ -55,6 +55,14 @@ var cityTroops = [];
 /* Used to determine time since last frame */
 var timeSinceLastFrame = new Date();
 
+/* if player has city surrounded */
+var surroundingCity = false;
+/* Dark portion of clicking */
+var darkSize = 0;
+
+/* Used for transitions */
+var transition = 0;
+
 /* Mouse coords */
 var mouseX = 0;
 var mouseY = 0;
@@ -128,9 +136,10 @@ function generateWorld(minX, maxX, minY, maxY, numCities, numArmies, minDistance
 			people: people,
 			x: (Math.random() * (maxX - minX)) + minX,
 			y: (Math.random() * (maxY - minY)) + minY,
-			health: people/25 /* people/25 is max health */,
-			fps: Math.random() * 250 + 1000 /* Food per second */,
+			health: people/25,
+			fps: Math.random()/2 + 0.75 /* Food per second */,
 			team: "neutral",
+			wallHealth: [wall1: 100, wall2: 100, wall3: 100, wall4: 100, wall5: 100, wall6: 10],
 			name: "" + consonants[Math.floor(Math.random() * (consonants.length - 1))] + vowels[Math.floor(Math.random() * (vowels.length - 1))] + consonants[Math.floor(Math.random() * (consonants.length - 1))] + vowels[Math.floor(Math.random() * (vowels.length - 1))] + consonants[Math.floor(Math.random() * (consonants.length - 1))]
 		});
 
@@ -274,24 +283,29 @@ function updateCities() {
 				army.food += (10000/map.cities[i].people + 5) * 0.05;
 				map.cities[i].food -= (10000/map.cities[i].people + 5) * 0.05;
 			}
+			
+			if (citySelected != i) {
+				
+				/* Population Growth */
+				var x = 0;
+				map.cities[i].people = map.cities[i].fps * ((-100000000)/(200+Math.E^(0.0000075 * x)) + 500000);
 
-			/* Population Growth */
-			map.cities[i].people *= 1.00001 + 50/map.cities[i].people;
+				/* Food Increase */
+				map.cities[i].food += map.cities[i].fps * 10;
 
-			/* Food Increase */
-			map.cities[i].food += 10000/map.cities[i].people + 5;
+				/* Repair city */
+				if (map.cities[i].health + map.cities[i].people/750 > map.cities[i].people/25) {
+					map.cities[i].health = map.cities[i].people/25;
+				} else {
+					map.cities[i].health += map.cities[i].people/1000;
+				}
 
-			/* Repair city */
-			if (map.cities[i].health + map.cities[i].people/750 > map.cities[i].people/25) {
-				map.cities[i].health = map.cities[i].people/25;
-			} else {
-				map.cities[i].health += map.cities[i].people/1000;
-			}
-
-			/* Pay people to owner */
-			if (map.cities[i].team == "player") {
-				army.troops += ((1.0001 + 50/map.cities[i].people) * map.cities[i].people - map.cities[i].people) * 0.05;
-				map.cities[i].people -= ((1.0001 + 50/map.cities[i].people) * map.cities[i].people - map.cities[i].people) * 0.05;
+				/* Pay people to owner */
+				if (map.cities[i].team == "player") {
+					army.troops += ((1.0001 + 50/map.cities[i].people) * map.cities[i].people - map.cities[i].people) * 0.05;
+					map.cities[i].people -= ((1.0001 + 50/map.cities[i].people) * map.cities[i].people - map.cities[i].people) * 0.05;
+				}
+				
 			}
 
 		}
@@ -319,7 +333,7 @@ function updateCities() {
 function updateAttackMenu() {
 
 	/* If city is still defending */
-	if (cityTroops.length > 0) {
+	if (cityTroops.length > 0 && !surroundingCity) {
 
 		for (var i = 0; i < armyTroops.length; i ++) {
 			if (armyTroops.length > 0 && cityTroops.length > 0) {
@@ -338,7 +352,7 @@ function updateAttackMenu() {
 					troop.y += 3 * (b/c);
 				}
 
-				if (new Date() - troop.shootTimer > 5000 && Math.sqrt(Math.pow(troop.x - cityTroops[troop.targeting].x, 2) + Math.pow(troop.y - cityTroops[troop.targeting].y, 2)) < troop.range) {
+				if (new Date() - troop.shootTimer > 1000 && Math.sqrt(Math.pow(troop.x - cityTroops[troop.targeting].x, 2) + Math.pow(troop.y - cityTroops[troop.targeting].y, 2)) < troop.range) {
 					/* Shoot */
 					cityTroops[troop.targeting].health -= troop.damage;
 
@@ -396,7 +410,7 @@ function updateAttackMenu() {
 					troop.y += 3 * (b/c);
 				}
 
-				if (new Date() - troop.shootTimer > 5000 && Math.sqrt(Math.pow(troop.x - armyTroops[troop.targeting].x, 2) + Math.pow(troop.y - armyTroops[troop.targeting].y, 2)) < troop.range) {
+				if (new Date() - troop.shootTimer > 1000 && Math.sqrt(Math.pow(troop.x - armyTroops[troop.targeting].x, 2) + Math.pow(troop.y - armyTroops[troop.targeting].y, 2)) < troop.range) {
 					/* Shoot */
 					armyTroops[troop.targeting].health -= troop.damage;
 
@@ -439,73 +453,156 @@ function updateAttackMenu() {
 
 	}
 
-	if (armyTroops.length < 0) {
+	if (armyTroops.length < army.troops/200) {
 		/* Lost */
-
+		
+		map.cities[citySelected].people += 50 * (cityTroops.length - map.cities[citySelected].people * 0.05 / 50) * (Math.random() / 10 + .7);
+		
 		citySelected = -1;
 
-		troops /= 1.5;
+		army.troops += 50 * (armyTroops.length - (army.troops/50)) * (Math.random() / 10 + .7);
 	}
-
-	if (cityTroops.length < 0) {
-		/* Blockade or Attack Wall */
-		
-
-
+	
+	if (surroundingCity) {
 		updateAttackCity();
+	} else if (cityTroops.length == 0) {
+		if (transition == 100) {
+			/* Blockade or Attack Wall */
+			for (var i = 0; i < armyTroops.length; i ++) {
+				armyTroops[i].x = canvas.width/2;
+				armyTroops[i].y = canvas.height/2;
+
+				armyTroops[i].x += 250 * Math.cos((2*Math.PI) / armyTroops.length * i);
+				armyTroops[i].y += 250 * Math.sin((2*Math.PI) / armyTroops.length * i);
+			}
+		}
+		
+		transition += 2;
+		
+		if (transition >= 200) {
+			surroundingCity = true;
+			transition = 0;
+		}
 	}
 }
 
 function updateAttackCity() {
-
+	/* Increases dark portion of clicable areas */
+	darkSize += (darkSize >= 25)? -1 * darkSize : 0.4;
 }
 
 /* Draw Attack menu */
 function drawAttackMenu() {
-	if (cityTroops.length > 0) {
-
-		for (var i = 0; i < armyTroops.length; i ++) {
-			var troop = armyTroops[i];
-
+	if (surroundingCity || transition >= 100) {
+		/* Draw city */
+		ctx.beginPath();
+		ctx.arc(canvas.width/2, canvas.height/2, 225, 0, 2 * Math.PI);
+		ctx.strokeStyle = "black";
+		ctx.lineWidth = 2;
+		ctx.stroke();
+		ctx.lineWidth = 1;
+		
+		ctx.beginPath();
+		ctx.arc(canvas.width/2, canvas.height/2, 224, 0, 2 * Math.PI);
+		ctx.fillStyle = "grey";
+		ctx.fill();
+		
+		ctx.beginPath();
+		ctx.arc(canvas.width/2, canvas.height/2, 199, 0, 2 * Math.PI);
+		ctx.fillStyle = "white";
+		ctx.fill();
+		
+		ctx.beginPath();
+		ctx.arc(canvas.width/2, canvas.height/2, 200, 0, 2 * Math.PI);
+		ctx.strokeStyle = "black";
+		ctx.lineWidth = 2;
+		ctx.stroke();
+		ctx.lineWidth = 1;
+		
+		/* Draws lines seperating the walls */
+		for (var i = 0; i < 6; i ++) {
 			ctx.beginPath();
-			ctx.arc(troop.x, troop.y, 10, 0, 2 * Math.PI);
-			ctx.fillStyle = "green";
-			ctx.fill();
+			ctx.moveTo(canvas.width/2 + 225 * Math.cos((2*Math.PI / 6) * i), canvas.height/2 + 225 * Math.sin((2*Math.PI / 6) * i));
+			ctx.lineTo(canvas.width/2 + 200 * Math.cos((2*Math.PI / 6) * i), canvas.height/2 + 200 * Math.sin((2*Math.PI / 6) * i));
+			ctx.lineWidth = 2;
+			ctx.stroke();
+			ctx.lineWidth = 1;
 		}
-
-		for (var i = 0; i < cityTroops.length; i ++) {
-			var troop = cityTroops[i];
-
+		
+		/* Draws clickable areas */
+		for (var i = 0; i < 6; i ++) {
 			ctx.beginPath();
-			ctx.arc(troop.x, troop.y, 10, 0, 2 * Math.PI);
+			ctx.arc(canvas.width/2 + 212.5 * Math.cos((2*Math.PI / 6) * i + (Math.PI / 6)), canvas.height/2 + 212.5 * Math.sin((2*Math.PI / 6) * i + (Math.PI / 6)), 25, 0, 2 * Math.PI);
 			ctx.fillStyle = "red";
+			ctx.globalAlpha = 0.25;
 			ctx.fill();
+			ctx.globalAlpha = 1;
+			
+			ctx.beginPath();
+			ctx.arc(canvas.width/2 + 212.5 * Math.cos((2*Math.PI / 6) * i + (Math.PI / 6)), canvas.height/2 + 212.5 * Math.sin((2*Math.PI / 6) * i + (Math.PI / 6)), darkSize, 0, 2 * Math.PI);
+			ctx.fillStyle = "red";
+			ctx.globalAlpha = 0.75;
+			ctx.fill();
+			ctx.globalAlpha = 1;
 		}
-
 	}
+	
+	for (var i = 0; i < armyTroops.length; i ++) {
+		var troop = armyTroops[i];
+
+		ctx.beginPath();
+		ctx.arc(troop.x, troop.y, 10, 0, 2 * Math.PI);
+		ctx.fillStyle = "green";
+		ctx.fill();
+	}
+
+	for (var i = 0; i < cityTroops.length; i ++) {
+		var troop = cityTroops[i];
+
+		ctx.beginPath();
+		ctx.arc(troop.x, troop.y, 10, 0, 2 * Math.PI);
+		ctx.fillStyle = "red";
+		ctx.fill();
+	}
+	
+	/* Fade in & out */
+	ctx.globalAlpha = 1 - (Math.abs(transition - 100) / 100);
+	ctx.fillStyle = "black";
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
+	ctx.globalAlpha = 1;
 }
 
 /* When mouse is clicked */
 document.onmouseup = function() {
+	/* If city is surrounded */
+	if (surroundingCity) {
+		
+	}
+	
 	/* Check if city is clicked */
-	for (var i = 0; i < map.cities.length; i ++) {
-		/* Check if city is rendered */
-		if ((map.cities[i].x - army.x)/500 * 1000 + canvas.width/2 > - 100 &&
-			(map.cities[i].x - army.x)/500 * 1000 + canvas.width/2 < canvas.width + 100 &&
-			(map.cities[i].y - army.y)/500 * 1000 + canvas.height/2 > - 100 &&
-			(map.cities[i].y - army.y)/500 * 1000 + canvas.height/2 < canvas.height + 100) {
+	if (!surroundingCity) {
+		for (var i = 0; i < map.cities.length; i ++) {
+			/* Check if city is rendered */
+			if ((map.cities[i].x - army.x)/500 * 1000 + canvas.width/2 > - 100 &&
+				(map.cities[i].x - army.x)/500 * 1000 + canvas.width/2 < canvas.width + 100 &&
+				(map.cities[i].y - army.y)/500 * 1000 + canvas.height/2 > - 100 &&
+				(map.cities[i].y - army.y)/500 * 1000 + canvas.height/2 < canvas.height + 100) {
 
-			if (map.cities[i].team != "player" && Math.sqrt(Math.pow((map.cities[i].x - army.x)/500 * 1000, 2) + Math.pow((map.cities[i].y - army.y)/500 * 1000, 2)) < 40 + 40 * (25/40) && Math.sqrt(Math.pow((map.cities[i].x - army.x)/500 * 1000 + canvas.width/2 - mouseX, 2) + Math.pow((map.cities[i].y - army.y)/500 * 1000 - mouseY + canvas.height/2, 2)) < 40 * (25/40)) {
-				citySelected = i;
+				if (map.cities[i].team != "player" && Math.sqrt(Math.pow((map.cities[i].x - army.x)/500 * 1000, 2) + Math.pow((map.cities[i].y - army.y)/500 * 1000, 2)) < 40 + 40 * (25/40) && Math.sqrt(Math.pow((map.cities[i].x - army.x)/500 * 1000 + canvas.width/2 - mouseX, 2) + Math.pow((map.cities[i].y - army.y)/500 * 1000 - mouseY + canvas.height/2, 2)) < 40 * (25/40)) {
+					citySelected = i;
+				}
+
 			}
-
 		}
 	}
 
-	if (citySelected > -1 && (armyTroops.length == 0 || cityTroops.length == 0)) {
+	if (!surroundingCity && citySelected > -1 && (armyTroops.length == 0 || cityTroops.length == 0)) {
 		/* resets arrays */
 		armyTroops = [];
 		cityTroops = [];
+		
+		/* resets city vars */
+		surroundingCity = false;
 
 		/* sets up army array */
 		for (var i = 0; i < army.troops / 50; i ++) {
